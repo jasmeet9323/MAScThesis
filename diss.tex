@@ -95,6 +95,68 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% My packages
+%%
+
+% color: add support for expressing colour models.  Grey can be used
+% to great effect to emphasize other parts of a graphic or text.
+\usepackage{xcolor}
+\definecolor{greytext}{gray}{0.5}
+
+%% url: for typesetting URLs and smart(er) hyphenation.
+% typeset urls in sans-serif
+\usepackage{url}
+\urlstyle{sf} 
+
+% tikz for creating graphics in latex
+\usepackage{tikz}
+\usetikzlibrary{calc, arrows.meta}
+
+% Use the command \Set{ } to typeset sets.
+\usepackage{braket}
+
+% Bold math fonts
+\usepackage{bm}
+
+% Set the margins
+\usepackage[left=1.25in,right=1in,top=1in,bottom=1in]{geometry}
+
+% Go to the next line instead of indenting, for a new paragraph.
+\usepackage[parfill]{parskip}
+
+
+% Put subfigures iside figures
+\usepackage{subcaption}
+
+% input algorithms
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+% multi row for tables
+\usepackage{multirow}
+
+% A diagonal box inside a table cell
+\usepackage{diagbox}
+
+% Multirow in tables 
+\usepackage{multirow}
+
+% listings: useful support for including source code listings, with
+% optional special keyword formatting.  The \lstset{} causes
+% the text to be typeset in a smaller sans serif font, with
+% proportional spacing.
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\footnotesize,showstringspaces=false,fontadjust}
+
+% For list of abbreviations
+\usepackage{enumitem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
