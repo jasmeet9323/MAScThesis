@@ -4,88 +4,24 @@
 %
 %-----------------------------------------------------------------------------
 \subsection*{Thesis Outline}
-Titles marked with (*) are optional and will be added if I find the
-extra time.
 
 \begin{enumerate}
-  
-\item Introduction
-  \begin{itemize}
-  \item (opening) General intro to CFD and higher order methods
-  \item Motivation: Current work on turbulent solvers, and the need for
-    three-dimensional generalization
-  \item Objective
-  \item Outline
-  \end{itemize}
-  
-\item Background
-  \begin{itemize}
-  \item The finite volume method
-  \item k-exact reconstruction
-  \item Flux evaluation methods
-  \item Studied equations: Advection-Diffusion, Euler, RANS+SA
-  \end{itemize}
-  
-\item Three dimensional mesh processing
-  \begin{itemize}
-  \item Control volume types: Introduce control volume types and their
-    mapping to reference elements. (* Introduce the issue for
-    reconstruction on pyramid elements)
-  \item Mesh connectivity conversion: Convert face to cell
-    connectivity as done in MeshCell3D preprocessing.
-  \item Numerical integration: On generating quadrature points and
-    their weights for general volume and surface integration.
-  \item Creating curved anisotropic meshes: Methodology and results
-    for solving the three dimensional elastic solid equations, from my
-    MATH520 final project.
-  \item Modified basis functions for reconstruction on highly
-    anisotropic meshes: Introduce the $\xi, \zeta, \frac{1}{2}\xi^2,
-    \xi\zeta, \frac{1}{2}\zeta^2\ldots$ reconstruction basis functions
-    and cite Alireza's work. Also introduce the simple
-    generalization with $\eta=z$ for the extruded meshes.
-  \end{itemize}
-  
-\item Solution of the discretized system of equations
-  \begin{itemize}
-  \item Pseudo-transient continuation, Jacobian Matrix: Jacobian
-    Assembly (*Matrix free method)
-  \item Linear Solvers: Richardson, KSP (GMRES in particular)
-  \item Preconditioning methods
+  \item Introduction
     \begin{itemize}
-    \item Single step preconditioning: Introduce ILU, Jacobi, Gauss-Sidel, Line
-      Jacobi, Line Gauss Sidel on full order and first order Jacobians
-    \item Find Lines of high DoF coupling  
-    \item Hierarchical preconditioning: Chain linear solvers to
-      improve performance
+      \item Introduction to Meshing
+      \item Introduction to unstructured meshing and its importance
+      \item Boundary Layer Phenomenon and its importance
+      \item Meshes that deal with such scenarios.
+      \item 2D previous works
+      \item 3D previous works
+      \item Surface Mesh generation methods
+        \begin{itemize}
+          \item Parametric Mapping
+          \item Direct 3D methods
+        \end{itemize}
     \end{itemize}
-  \end{itemize}
-  
-\item Numerical results
-  \begin{itemize}
-    \item Three dimensional advection-diffusion in a box: Show correct
-      implementation of numerical quadrature by observing the correct
-      convergence orders. Verify using exact solution.
-    \item Subsonic inviscid flow around a sphere: Show the successful
-      work of the preconditioner, and parallel scaling. Try to run up
-      to 1M degrees of freedom. (*Implement matrix free method and
-      compare storage.) Small verification by entropy norm.
-    \item Subsonic two dimensional flow around multi element airfoil:
-      Show the effectivity of the preconditioner for previously solved
-      flows. No verification, maybe just show that the drag and lift
-      are the same as before.
-    \item Three dimensional turbulent flow around flat plate: Study
-      scaling of the preconditioner. Full verification with NASA
-      website. Study scaling.
-      \item Three dimensional turbulent flow around extruded
-        NACA0012: Demonstrate convergence. Report $C_f$ and $C_p$
-        contours plus lift and drag coefficients (* Use curvilinear
-        coordinates, and mixed meshes if possible).
-  \end{itemize}
-  
-\item Conclusions
-
+  \item   
 \end{enumerate}
-
 %%% Local Variables:
 %%% TeX-master: "diss"
 %%% End:
