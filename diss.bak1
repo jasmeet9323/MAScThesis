@@ -101,9 +101,6 @@
 %% My packages
 %%
 
-%% Definitions
-\newtheorem{definition}{Definition}    %% this does it
-
 % color: add support for expressing colour models.  Grey can be used
 % to great effect to emphasize other parts of a graphic or text.
 \usepackage{xcolor}
