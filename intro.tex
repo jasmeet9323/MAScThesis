@@ -19,24 +19,45 @@ The process of discretization of the domain to form the basis of solving the Nav
 A mesh $M$ is a geometrical discretization of a domain $\Omega$ that consists of (a) a collection of mesh entities $M_i$ of controlled size and distribution and (b) topological relationships or adjacencies forming the graph of the mesh. The mesh $M$ covers $\Omega$ without neither overlap nor hole.
 \end{definition}
 
-The evolution of mesh generation can be correlated to the evolution of compute power available to the boffins. With the advent of third generation computers (1964-1971) carryinig integrated circuits, engineers were able to automate some of the manual processes in mesh generation. Meshes consisting of a template that repeats itself could be generated. These meshes were called structured meshes as their adjacencies or relationships could be known implicitly. The connectivity pattern repeats in such a mesh. Figure \ref{fig-block-structured-mesh} shows such a mesh for NACA 0012 airfoil.
-
 \begin{figure}
+  \centering
   \begin{subfigure}{0.5\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{img/intro/structured.jpg}
+    \includegraphics[width=0.8\linewidth]{img/intro/mStructured.png}
     \caption{}
+    \label{fig-structured-ij}
   \end{subfigure}%
   \begin{subfigure}{0.5\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{img/intro/structuredCloseUp.jpg}
-    \caption{}
+    \includegraphics[width=0.8\linewidth]{img/intro/mUnstructured.png}
+    \caption{fig-unstructured-ij}
   \end{subfigure}%
-  \caption{Block Structured Mesh of NACA 0012 airfoil. (a) Overall Mesh (b) Close Up Image of the Mesh at the leading edge of the airfoil \cite{HOPR}.}
-  \label{fig-block-structured-mesh}
+  \caption{}
+  \label{fig-structured-unstructured}
 \end{figure}
 
-Structured meshes were attractive to engineers because of their low memory usage because of repeated topology. Also, given simple domains to mesh, these meshes were optimal for minimizing the errors in CFD, resulting in faster simulations \cite{d1991optimal}.
+The evolution of mesh generation can be correlated to the evolution of compute power available to the boffins. With the advent of third generation computers (1964-1971) carryinig integrated circuits, engineers were able to automate some of the manual processes in mesh generation. Meshes consisting of a template that repeats itself could be generated. These meshes were called \textit{structured meshes} as their adjacencies or relationships could be known implicitly. Consider a grid in two dimensions as shown in Figure \ref{fig-structured-ij}. Given a cell $(i,j)$ we can identify its neighbours as $(i-1, j)$ to the left and $(i+1, j)$ to the right. Similarly, cell $(i, j+1)$ will be to the top and $(i, j-1)$ would be to its bottom. The connectivity pattern repeats in such a mesh. Figure \ref{fig-structuredNaca0012} shows a structured mesh generated for NACA 0012 airfoil around its leading edge.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\linewidth]{img/intro/stucturedNaca0012.png}
+  \caption{Structured mesh around leading edge of a NACA 0012 airfoil}
+  \label{fig-structuredNaca0012}
+\end{figure}
+
+
+Structured meshes were attractive to engineers because of their low memory usage as the topology of the cells is repeated. Also, given simple domains to mesh, these meshes were optimal for minimizing the errors in CFD, resulting in faster simulations \cite{d1991optimal}. Programming CFD solvers with these meshes was easy as cell connectivity occurs in a regular fashion. However, as the scope of CFD simulations grew over time and more complex geometries were becoming commonplace, the task of generating structured meshes around them proved to be a daunting one. 
+
+The disadvantage of using a structured mesh for more complex geometries is the increase in grid non-orthogonality or skewness that can cause unphysical solutions due to the transformation of the governing equations\cite{TU2013219}. The transformed equations that accommodate the non-orthogonality act as the link between the structured coordinate system (such as Cartesian coordinates) and the body-fitted coordinate system, but contain additional terms, thereby augmenting the cost of numerical calculations and difficulties in programming. Hence, a structured mesh may affect the accuracy and the efficiency of the numerical schemes used by a solver. Additionally, the tedious process of generating such meshes for more complex geometries was hard to justify. Hence, more flexible and automatic methods were devised. These methods produced meshes in a more random manner but with little human intervention. Broadly, the meshes produced by such methods were classified as \textit{unstructured meshes}.
+
+The cost of solution for unstructured meshes is high as compared to their structured counterparts and the amount of memory usage is also high as the topology of the mesh is no longer repeated. Still, they are more widely used today because of their capability to handle arbitrary complex geometries, their capability to automate the mesh generation process and their flexibility in refinement based on the geometry topology and/or the solution gradients.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\linewidth]{img/intro/unstructuredNaca0012.png}
+  \caption{Unstructured mesh around leading edge of NACA 0012 airfoil}
+  \label{fig-unstructuredNaca0012}
+\end{figure}
 
 \section{Boundary Layer Phenomenon}
 
