@@ -65,9 +65,54 @@ The cost of finding flux at a wall, a widely used parameter in Finite Volume Met
 \end{figure}
 
 \section{Boundary Layer Meshes}
+\label{sec-boundaryLayerMesh}
 
-With the advent of several unstructured mesh generation techniques (cite them), a broader selection of geometries could be dealt with. This immensely increased the scope of CFD solvers and pushed the limits of numerical methods in terms of accuracy and speed. However, a different approach was needed for the parts of the mesh in which viscous forces were more dominant as compared to the inertial forces. In other words, at the location of the viscous boundary layer, a mesh generation technique which would help in resolving the strong gradients of the velocity in the direction normal to the boundary was required. For example, consider a flow over an airfoil. The velocity of the fluid at the surface of the airfoil is zero. However, the velocity becomes freestream velocity very near to the surface. The thickness of this layer of fluid, where the freestream velocity goes from a value of zero to a value of around 0.95 times the freestream velocity is called as the boundary layer. It is also called the viscous boundary layer as the viscous effects are dominant in this layer.
+With the advent of several unstructured mesh generation techniques (cite them), a broader selection of geometries could be dealt with. This immensely increased the scope of CFD solvers and pushed the limits of numerical methods in terms of accuracy and speed. However, a different approach was needed for the parts of the mesh in which viscous forces were more dominant as compared to the inertial forces. In other words, at the location of the viscous boundary layer, the gradient of physical measures like velocity is several magnitudes higher in one direction as compared to its orthogonal direction. A mesh generation technique which would help in resolving such strong gradients of the velocity in the boundary layer was required. For example, consider a flow over a flat plate as shown in Figure \ref{fig-boundaryLayer}. The velocity of the fluid at the surface of the plate is zero. However, the velocity becomes freestream velocity $u_0$ very near to the surface. The thickness of this layer of fluid, where the freestream velocit	y goes from a value of zero to a value of around 0.95 times the freestream velocity is called as the boundary layer thickness $\delta$. It is also called the viscous boundary layer as the viscous effects are dominant in this layer.
+
+\begin{figure}
+  \centering	
+  \includegraphics[width=0.8\linewidth]{img/intro/boundaryLayer.jpg}
+  \caption{Fluid flow over a flat plate.}
+  \label{fig-boundaryLayer}
+\end{figure}
 
 \section{Anisotropic Meshing}
+
+The need to resolve the steep gradients at the boundary layer of the fluid flow gave rise to a type of mesh development strategy called anisotropic meshing. An anisotropic mesh is simply a mesh which has highly stretched elements. In other words, the aspect ratio of the elements for an anisotropic mesh would be really high. Such a packing of the cell elements is required to provide a large number of Degree Of Freedom (DOF) along the direction of steep gradients of physical quantities such as velocity. Traditionally generated isotropic meshes are incapable of resolving such steep gradients \cite{frey2005anisotropic}. 
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.5\linewidth}
+	  \centering
+	  \includegraphics[width=0.9\linewidth]{img/intro/isotropic.png}
+	  \caption{Isotropic mesh}
+	  \label{fig-isotropic}
+	\end{subfigure}%
+	\begin{subfigure}{0.5\linewidth}
+		\centering
+		\includegraphics[width=0.88\linewidth]{img/intro/anisotropic.png}
+		\caption{Anisotropic Mesh}
+		\label{fig-anisotropic}
+	\end{subfigure}
+	\caption{Isotropic and Anisotropic Mesh Fragments}
+	\label{fig-isotropic-anisotropic}
+\end{figure}
+
+Figure \ref{fig-isotropic} shows an isotropic mesh. The mesh elements have almost equal edge lengths. Here, the mesh elements are triangles and resemble equilateral triangles for most parts of the mesh. Given a point in the mesh, all the directions are the same and there isn't any bias towards a particular direction. For an isotropic physical process, such a mesh will serve the purpose and resolve gradients in all directions given the resolution of the mesh is appropriately chosen. However, if the physical process to be simulated is highly anisotropic, such as the velocity distribution along the boundary layer of the flat plate, as discussed in section \ref{sec-boundaryLayerMesh}, such a mesh will fail to resolve the steep velocity gradients. It would have to be refined to get the required refinement at the boundary, increasing the total number of DOFs in the mesh by a polynomial factor. Hence, a more reasonable mesh generation strategy is needed.
+
+Figure \ref{fig-anisotropic} shows an anisotropic mesh. The triangular elements of the mesh are highly streched, with one edge being considerably shorter than the other two. The number of DOFs is distributed over the domain in a fashion so as to have the majority of the DOFs along the steep gradients of the physical quantities to be simulated. Hence, cell alignment with the solution to capture anisotropic flow features is possible with such a mesh.
+
+\subsection{2D}
+
+\subsection{3D}
+
+\section{Simplical and Non-Simplical Meshes}
+
+\section{Surface Meshing}
+
+\section{Motivation}
+
+\section{Outline}
+
 
 \section{Objective and Outline}
