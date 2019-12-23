@@ -11,7 +11,7 @@
 
 Computational Fluid Simulations (CFD) is a field of study where scientists and engineers architect new ways to numerically solve fluid flow equations. Before the advent of computers, numerical solutions of differential equations was done by hand. This lead to a great deal of work in the direction of creating faster algorithms to solve differential equations. An example is the development of the Fast Fourier Transform (FFT) by Cornelius Lancoz to increase the computation speed of Discrete Fourier Transform (DFT). However, since the development and advancement of computers, engineers had a significant amount of compute power to work with. This lead to the development of highly accurate methods (as compared to before) to simulate flow over various objects. These simulations have since gotten bigger and better, typically including millions of degrees of freedom, even starting to touch a billion in regular industry use.
 
-\section{Mesh Generation - A brief overview}
+\section{Mesh Generation - A brief Overview}
 
 The equations which govern the conservation of mass, momentum and energy of a moving fluid also called Navier-Stokes equations are solved in the given domain to simulate fluid flow in that domain. In order to numerically solve these equations, we need a discretization of the given domain. This discrete basis required to solve the Navier-Stokes equations is called a mesh. Simply put, a mesh is a collection of points, lines and cells that together construct the space around a body in a fluid flow.
 
@@ -65,6 +65,7 @@ The cost of finding flux at a wall, a widely used parameter in Finite Volume Met
 \end{figure}
 
 \section{Simplicial and Non-Simplicial Meshes}
+\label{sec-simplicial}
 
 Before discussing about simplicial and non-simplicial meshes, we need to define certain terms. In geometry, a simplex is a generalization of teh notion of a triangle or tetrahedron to arbitrary dimensions. For example, a 0-simplex is a point, a 1-simplex is a line segment, a 2-simplex is a triangle and a 3- simplex is a tetrahedron. See Figure \ref{fig-simplices} for an illustration.
 
@@ -188,7 +189,7 @@ Figure \ref{fig-anisotropic} shows an anisotropic mesh. The triangular elements 
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\linewidth]{img/intro/aspectRatio.png}
+	\includegraphics[width=0.6\linewidth]{img/intro/aspectRatio.png}
 	\caption{Illustration of different aspect ratio triangular and quadrilateral elements.}
 \end{figure}
 
@@ -249,26 +250,120 @@ A family of anisotropic mesh generation techniques fall under the Advancing Laye
 While the majority of anisotropic mesh generation strategies focused on simplicial mesh elements, there have been some works which generate all quadrilateral (quad) surface meshes. A method by Lee \etal showed an anisotropic quadrilateral mesh generation scheme which generates a background triangular mesh and then proceeding with a cell merging procedure in the parametric space to produce the desired mesh \cite{lee2003new}. A different kind of method was adopted by Viswanath \etal to generate quadrilateral meshes with anisotropy and directional control \cite{viswanath2000quadrilateral}. A 2D geometric domain and desired level of anisotropy - as a metric tensor over the domain - specifying mesh sizing in two independent directions is taken as an input. Thereby node locations are calculated by closely packing recctangles in accordance with the inputs. An example mesh generated with this strategy is shown in Figure \ref{fig-anisotropicQuadMesh}.
 
 \subsubsection{3D}
+\label{sec-3D}
 
-Several methods which generate 2D meshes can be extended to 3D \cite{lohner1993matching, nakahashi1987fdm,castro1997anisotropic}.
+\begin{figure*}
+\begin{minipage}{0.45\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{img/intro/lit/shephard.png}
+	\caption{Boundary layer mesh for simulation of ow in blood vessels: (a) geometric model; (b) zoom in of surface mesh in the encircled region; (c);(d) cross-sections showing the boundary layer and isotropic meshes \cite{garimella2000boundary}.}
+	\label{fig-shephard}
+\end{minipage}\hfill
+\begin{minipage}{0.45\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{img/intro/lit/ito.png}
+	\caption{Hybrid grid for an aircraft (NAXST-2). Two images show the cross-section of the mesh at three different locations along the chord of the airfoil \cite{ito2002unstructured}.}
+	\label{fig-ito}
+\end{minipage}
+\end{figure*}
 
-The method used by Shimada and Yamada in two dimensions has also been extended to three dimensions to generate anisotropic tetrahedral meshes. Given an arbitrary input anisotropy function, the algorithm generates high quality anisotropic tetrahedral mesh that conforms to the input geometry \cite{yamakawa2000high}.
+Given an initial surface discretization, several 3D mesh generation algorithms have been generated to create anisotropic volume meshes. Many methods which generate two-dimensional anisotropic  meshes can be extended to 3D \cite{lohner1993matching, nakahashi1987fdm,castro1997anisotropic}.
+
+A generalized advancing layer method for generating 3D boundary layer mesh was presented by Garimella \etal \cite{garimella2000boundary}. Model boundaries grow into the domain to fill to generate the mesh in this method. An example mesh can be seen in Figure \ref{fig-shephard}. Another method was introduced by Ito \etal \cite{ito2002unstructured}. Here, a hybrid mesh was generated which comprised of tetrahedra, prisms and pyramids. First, the domain was filled with an isotropic tetrahedral mesh. Subsequently, the boundary walls were shifted inwards and the resulting gap between the tetrahedra and the walls was filled up with prismatic elements. Figure \ref{fig-ito} shows a mesh generated using such a strategy. This mesh generation strategy, of using a highly anisotropic semi-structured mesh near the boundaries of the domain (however, with no gradation over the boundary of the domain), and an isotropic mesh further away from domain boundaries is quite common in 3D meshing. Another example of such a strategy is shown in the work done by Sahni \etal \cite{sahni2008adaptive}. Here, mesh adaptation was applied to a hybrid mesh, with semi-structured stretched elements at the boundary and isotropic elements away from the boundary. Figure \ref{fig-sahni} shows a mesh generated by this method.
+
+The method used by Shimada and Yamada in two dimensions has also been extended to three dimensions to generate anisotropic tetrahedral meshes. Given an arbitrary input anisotropy function, the algorithm generates high quality anisotropic tetrahedral mesh that conforms to the input geometry \cite{yamakawa2000high}. A mesh generated from this method can be seen in Figure \ref{fig-yamakawa}.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\linewidth]{img/intro/lit/highQualityTetMesh.png}
 	\caption{Anisotropic Tetrahedral Mesh generated using ellipsoidal bubble packing methodology  \cite{yamakawa2000high}}
-	\label{fig-anisotropicTetMesh}
+	\label{fig-yamakawa}
 \end{figure}
 
-In another work, a metric-orthogonal anisotropic mesh is generated by aligning the mesh to a metric, mesh elements are also aligned with teh eigenvectors \cite{loseille20093d}. The quality of the input metric strongly affects the output mesh.
+In another work, a metric-orthogonal anisotropic mesh is generated. In addition to aligning the mesh to a metric, mesh elements are also aligned with the eigenvectors \cite{loseille20093d}. The quality of the input metric strongly affects the output mesh.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\linewidth]{img/intro/lit/sahni.png}
+	\caption{ Collection of mesh faces cut by the vertical center- plane through the adapted boundary layer mesh of a porcine aorta. The windows correspond to magnified views which also show the initial boundary layer mesh \cite{sahni2008adaptive}.}
+	\label{fig-sahni}
+\end{figure}
+
+Another method which generates a hybrid mesh using semi-structured boundary layer mesh and an isotropic outer mesh was given by Ito \etal \cite{ito2007multiple}. Here, special treatment of sharp corners on the surface was done by adding multiple marching directions at the sharp corner. This resulted in generation of a better volume mesh. The research showed that if the corners of the surface mesh, from which the volume mesh is generated, are treated specially and are hence refined more than other regions of the surface, the volume mesh thus generated would be of superior quality. More importantly, such special treatments of sharp corners in the surface mesh helps to create semistructured elements (for viscous boundary layer mesh) around singular points on the surface. A very important problem addressed by this study is one of the pivotal reasons to write this thesis.
+
+Consider Figure \ref{fig-cornerIto} from the work by Ito \etal \cite{ito2007multiple}. An intersection between three surfaces is considered. There are labeled $S_A, S_B$ and $S_C$. The surfaces can represent a wing upper surface, a blunt trailing edge and a fuselage, respectively. As most of the surface meshes are simplical, isotropic and don't treat corners specially, the task to generate a valid viscous boundary layer mesh from them is considerably difficult. This difficulty is compounded at complex corners like the one shown in the figure. The paper puts forward a technique to discretize the surface further by adding new nodes and faces to the surface at such corners. In the figure, nodes are added along the direction $BA$. This process helps in creating additional normal directions near the corners of the surface and solves the problem of singularity to a great extent.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\linewidth]{img/intro/lit/cornerIto.png}
+	\caption{Three boundary surfaces $S_A, S_B, $ and $S_C$ \cite{ito2007multiple}}
+	\label{fig-cornerIto}
+\end{figure}
 
 \section{Motivation}
 \label{sec-motivation}
 
-The methods mentioned above generate good quality anisotropic meshes. However, they have some drawbacks. Firstly, almost all of the methodologies which produce anisotropic meshes generate simplicial mesh elements. These simplicial meshes have an advantage of good flexibility in descretizing the domain, especially if it contains complex features. However, the vertex connectivity of simplicial mesh elements is high. The number of edges in a tetrahedral mesh is about seven times the number of vertices. On the other hand, in a hexahedral mesh, the number of edges is only about three times the number of vertices (asymptotically). The cost of vertex-based discretization is directly proportional to the number of edges in a mesh. Hence, non-simplicial meshes are substantially more efficient than simplicial meshes for a given number of unknowns or grid points. Also, regular arrays of nonsimplicial elements may also enhance accuracy, owing to a local cancellation of truncation errors that may not occur on groups of nonsimilar simplicial elements \cite{mavriplis1997unstructured}.
+\subsection{Surface Mesh Generation Strategies}
 
-Non-simplicial quadrilateral elements have been preferred over triangles in highly stretched two-dimensional grids due to their lower connectivity \cite{aftosmis1994accuracy}. The advantages of non-simplicial mesh elements have resulted in fully non-simplicial mesh generation techniques \cite{blacker1991paving, zhu1991new}.
+Stretched volume meshes are generated from an initial triangulation of a surface. These surfaces are usually represented by Non-Uniform Rational B-Splines or NURBS in various Computer Aided Design (CAD) packages. Generation of the surface mesh requires a separate methodology or algorithm as compared to the two-dimensional mesh generation as the mesh elements include a third dimension.
 
-\section{Surface Meshing}
+%%Method1
+
+A majority of surface mesh generation methods produce a surface mesh from the parametric mapping of a two-dimensional mesh onto a surface \cite{george1998delaunay, chen1997delaunay}. Usually, a two-dimensional Delaunay mesh is generated over a parametric surface and then mapped onto the curved surface. This method is attractive as it is simple and there are a number of robust Delaunay mesh generation schemes available to generate the initial two-dimensional mesh. However, the mapping from 2D to 3D doesn't always give satisfactory results in terms of mesh element quality. This method doesn't always form well shaped surface elements, especially when the surface derivatives vary over the domain \cite{owen1998survey}. Meshes generated by such methods are generally isotropic and simplical. Hence, in addition to dealing with the badly shaped elements, several other post-processing operations need to be applied to them before generating a boundary layer volume mesh.
+
+%%Method2
+
+A different approach to surface mesh generation is adopted by methods which use the first fundamental form of the surface. In such methods, a metric is derived from the parametric representation of the surface and mesh elements are placed over the surface in an advancing front fashion with respect to this metric. Culli\'ere deviced one such method where he used a nodal density function based on the curvature of the surface to discretize it \cite{cuilliere1998adaptive}. An advancing front triangular mesh generation method was presented where 3D parametric surfaces could be meshed with good quality mesh elements. Joseph \etal presented a method which used a Riemannian surface definition to determine the amount of distortion of the elements in parametric space. Thereby, an advancing front method is applied to utilize this metric and generate good quality triangular elements over the surface. Figure \ref{fig-joseph} shows a mesh generated with this method. These methods, which use the parametric representation of the surface produce good quality triangular surface meshes. However, they are not well-suited to generate three dimensional anisotropic meshes with highly stretched elements. Additionally, the elements generated by such methods are simplical and hence, have their own drawbacks as discussed in section \ref{sec-simplicial}.
+
+\begin{figure*}
+	\centering
+	\begin{minipage}{0.45\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{img/intro/lit/joseph.png}
+		\caption{A CAD surface meshed with Reimannian space mesher}
+		\label{fig-joseph}
+	\end{minipage}
+\end{figure*}
+
+%%Method3
+
+Lastly, surface meshes can also be generated by placing the mesh elements directly on the surface of the geometry. Lao and Lu \cite{lan1996finite} provide a method to produce a surface mesh over a given analytical surface. A given element density function is utilized and mesh elements are placed on the analytical surface using the advancing front technique. The elements are optimized considering factors such as surface curvature, element to element turning angle and the given density distribution, to get a high-quality surface mesh. Figure \ref{fig-lu} shows meshes generated with this method. With respect to being an input for a 3D viscous boundary layer mesh, these meshes have similar drawbacks as the ones discussed earlier. Mesh elements generated are triangular rather than quadrilateral or hybrid. Also, there is an additional input to the mesh, which is the density function. Lastly, the boundary curves of the surface are not dealt with specially and the complete surface is isotropically meshed.
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.5\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{img/intro/lit/lu1.png}
+		\caption{A ruled surface.}
+		\label{fig-lu1}
+	\end{subfigure}
+	\begin{subfigure}{0.5\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{img/intro/lit/lu2.png}
+		\caption{A free form surface.}
+		\label{fig-lu2}
+	\end{subfigure}
+	\caption{Meshes generated directly over the surface by utilizing the analytical surface representation and element density distribution \cite{lan1996finite}.}
+	\label{fig-lu}
+\end{figure}
+
+%%Consolidating
+
+\subsection{Consolidating The Discussion}
+
+%% 1. Hybrid
+\subsubsection{Hybrid}
+Consolidating our discussion on surface meshes, we find that most of the 3D surface meshes generated are triangular. In other words, these meshes are simplical. We discussed the pitfalls of using simplical mesh elements at the regions of anisotropy or at surface boundaries in \ref{sec-simplicial}. To recapitulate, higher vertex connectivity for simplicial meshes makes them inefficient when using a vertex-based discretization method. On the other hand, quad meshes in two dimensions and hex meshes in 3D are substantially more efficient than their simplicial counterparts for the same number of Degrees of Freedom. In addition to that, non-simplicial elements arranged in repeating arrays may enhance solution accuracy by local cancellation of truncation errors while their simplicial counterparts may fail to do so \cite{mavriplis1997unstructured}. Non-simplicial quadrilateral elements have been preferred over triangles in highly stretched two-dimensional grids due to their lower connectivity \cite{aftosmis1994accuracy}.
+
+Even though non-simplicial elements are more efficient in mesh generation, conforming such elements to complex geoemtry remains a daunting task. Generally, manual input is required to generate all-quad surface meshes or all-hex volume meshes in the regions of geometric complexities. Hence, usage of simplicial mesh elements in these regions is a reasonable alternative. Hence, a surface mesh generation scheme is required, which generates a quad-dominant mesh with a very limited number of triangular elements. Regular arrays of highly-stretched quadrilateral elements should form the anisotropic boundary layer mesh. On the other hand, triangular elements could be used whenever one wants to conform to the geometry and increase the quality of the mesh elements generated.
+
+%% 2. 3D
+\subsubsection{Good Input For Anisotropic 3D Mesh}
+Following the discussion from \ref{sec-3D}, it is particularly difficult to generate  hybrid 3D meshes from an isotropic surface discretization. At the minimum, several invalidation checks needs to be performed at the singularity points of the surface so as to generate a valid viscous 3D mesh. In addition to that, the anisotropy of the 3D mesh becomes extremely difficult to control at the complex corners of the surface if they are not handled specially. One solution discussed earlier was to add additional marching directions and nodes at the complex corners on the surface of the mesh so as to add additional normal directions near the complex corners. However, the root cause of the problem is the isotropic surface discretization which is completely unaware of its usage into a anisotropic 3D volume mesh generator. Hence, 
+
+%% 2. Automatic and Flexible
+\subsubsection{Automatic and flexible}
+
+\subsection{Advancing Layer Surface Mesh Generation}
+
 \section{Outline}
