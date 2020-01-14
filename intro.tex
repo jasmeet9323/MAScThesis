@@ -143,7 +143,7 @@ Additionally, regular arrays of nonsimplical elements may also enhance accuracy,
 \begin{figure}
 	\centering
 	\includegraphics[trim={0 65.5cm 0 14cm },clip,width=\linewidth]{img/intro/lit/quadMesh.png}
-	\caption{A non-simplical quad mesh generated with paving methodology \cite{blacker1991paving}.}
+	\caption{A non-simplicial quad mesh generated with paving methodology \cite{blacker1991paving}.}
 	\label{fig-quadMesh}
 \end{figure}
 
@@ -370,7 +370,7 @@ Following the discussion from \ref{sec-3D}, it is particularly difficult to gene
 
 The surface mesh generation methodologies either have several assumptions on the type of surfaces they can support or need a considerable amount of human intervention to complete. Specially for the cases where complex corners exist on the surface, a good surface mesh would need special arrangement of nodes and marching directions on the surface so as to produce a high-quality anisotropic volume mesh. Block structured meshes could be produced on a surface by manually discretizing the domain into several subdomains and meshing them using structured mesh generation technique independently. But again, the mesh generation process would be very tedious and would take a considerable amount of manpower. Hence, an automatic mesh generation technique which has a good level of anisotropy at surface boundary curves is desirable to serve as a good input to 3D mesh generation. Lastly, the mesh generation process could use flexibility in terms of the surface representation it can accept as an input. Many methods discussed earlier use the parametric form of the surface to generate the mesh. Additionally, some methods also require an element density distribution to be specified for the entire domain of the surface which needs to be meshed. These constraints again make it cumbersome to generate good quality surface meshes (for anisotropic volume meshes) for a wide variety of surface topologies. Hence, a method of surface mesh generation which accepts a more widely used surface representation is highly desirable.
 
-\subsection{Advancing Layer Surface Mesh Generation}
+\subsection{Entire Domain Advancing Layer - Surface Mesh (EDAM-S) Generation}
 
 We present a surface mesh generation algorithm that serves to address the aforementioned issues and carries desired qualities. The algorithm generates a surface mesh which has anisotropic characteristics normal to the boundary curves of the surface. The mesh elements are highly-stretched at these boundary curves of the surface and have a required level of directional anisotropy normal to the boundary curves. For the examples in this thesis, the boundary curves of the surface are chosen to be the curves where the surface normal direction jumps abruptly. Practically, the algorithm is independent of the selection of the boundary curves and can work for any selected set of boundary curves for a given surface. However, for the sake of automaticity and simplicity, the boundary curves are chosen to be the sharp features on the surface topology.
 
