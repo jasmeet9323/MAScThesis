@@ -252,6 +252,110 @@ Figure \ref{point-insert} shows the process of point insertion and local reconne
 
 %Before moving on to extrude other vertices in the zeroth layer, we do some edge swapping operations in the neighbourhood of the inserted vertex so as to improve the quality of the mesh in the region before we start to project other vertices from the previous layer. This process makes it easier for the vertices which remain to be extruded, to be projected inside the right triangle. Hence, it is easier to recover the next front to continue the mesh generation procedure.
 
+\section{Extrusion Length Scaling}
+
+The initial extrusion length $x_i$ for the mesh is an input parameter provided by the user. This length, along with the growth ratio $g$ defines the refinement in the direction normal to the boundary curves in the surface mesh. Keeping $x_i$ constant along the boundary curve is one way to proceed with the mesh generation procedure. However, at the concave corners of the mesh, using a uniform extrusion length would result in immediate front collapse as the neighbours of the corner would race towards each other while the corner vertex lags behind in the advancing layers. Hence, some sort of extrusion length scaling is required at the front which takes into account the angle included between the edges adjacent to the vertex on the front.
+
+
+Let us consider a concave corner vertex $P$ in the mesh located at an advancing layer. The adjacent edges to $P$ on the layer are $PR$ and $PQ$. The included angle between these two edges is denoted as $2\theta$. Let's assume that the length of the edge $PQ$ is $l$ (see Figure \ref{fig:basic-diagram-extrusion-factor}) and the extrusion length for the layer at which vertex $P$ is located as $h$. We need to find a reasonable extrusion direction and extrusion length for the corner point P.
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[width=.6\linewidth]{img/m1/extrusionScaling/extrusionScaling.eps}
+    \caption{Extrusion }
+    \label{fig:basic-diagram-extrusion-factor}
+\end{figure}
+
+For good quad cells in the surface mesh, i.e. quad cells with angles as close to right angles as possible, we need the point $P$ to `race' a bit initially towards the interior to catch up with its adjacent points. This would be helpful in avoiding mesh collisions. Hence, we formulate a method to find the scaling factor for the extrusion length.
+
+The line $\mathit{PC}$ is constructed at equal angles from edge $\mathit{PR}$ and $\mathit{PQ}$. Let us place the point $\mathit{X}$ extruded from point $P$ on the line $\mathit{PC}$. In an orthogonal structured mesh scenario, if the angle between $\mathit{PR}$ and $\mathit{PQ}$ was 180 degrees, the extrusion direction should have been along the edge $\mathit{PA}$ and the extruded point would be at a distance $\mathit{h}$ from the point $\mathit{P}$, which coincides with point $\mathit{A}$ in the figure. The quad thus formed would have been $\mathit{PABQ}$. However, this is not the case. We have a skewed interior angle between $\mathit{PQ}$ and $\mathit{PR}$. If we place the extruded point at a distance $\mathit{h}$ from $\mathit{P}$ along $\mathit{PC}$, the mesh is going to fold onto itself in the next few layers. To avoid this, we take an alternative approach. We place the point $\mathit{X}$ further away from distance $\mathit{h}$. This distance is calculated using the following strategy.
+
+The area of the quad $\mathit{PABQ}$ would have been $h\times l$ in the orthogonal mesh case. Our strategy is to put the point $\mathit{X}$ on the line $\mathit{PC}$ such that the area of quad $\mathit{PXBQ}$ is also $\mathit{h\times l}$.
+%This will lead to the distance $PX$ being more than $h$.
+
+Let us assume that the line $\mathit{PC}$ intersects $\mathit{AB}$ at point $\mathit{T}$. The area of the quad $\mathit{PTBQ}$ is common to both quads $\mathit{PABQ}$ and $\mathit{PXBQ}$. Hence, to make the area of the quads $\mathit{PABQ}$ and $\mathit{PXBQ}$ the same, we just have to equate the area of $\mathit{\bigtriangleup APT}$ and $\mathit{\bigtriangleup XTB}$.
+%\begin{equation}
+%    Area(PABQ) = Area(PXBQ)
+%    \label{eqn:area-constraint}
+%\end{equation}
+%\begin{equation}
+%    Area(PABQ) = hl
+%\end{equation}
+\begin{equation}
+    Area(\mathit{\bigtriangleup ATP}) = Area(\mathit{\bigtriangleup TXB})
+    \label{eqn:area-constraint}
+\end{equation}
+
+Using this equation, we can find the length $\mathit{PX}$. Let us assume that line segment $\mathit{PT}$ is of length $s_1$ and $\mathit{TX}$ is of length $s_2$. Hence, $\mathit{PX = s_1 + s_2}$. $s_1$ can be easily computed as $h/\sin \, \theta$. To find $s_2$, we use the area constraint from equation \ref{eqn:area-constraint}. Area of triangles $\mathit{\bigtriangleup ATP}$ and $\mathit{\bigtriangleup TXB}$ can be easily computed in terms of variables $h$, $l$ and $\theta$.
+\begin{equation}
+    Area(\mathit{\bigtriangleup ATP}) = \dfrac{1}{2} \, . \,  h \, .  \, \dfrac{h}{\tan \, \theta}
+    \label{eqn-area1}
+\end{equation}
+
+\begin{equation}
+    Area(\mathit{\bigtriangleup TXB}) = \dfrac{1}{2} s_2 \left(l - \dfrac{h}{\tan \, \theta}\right) \sin \, \theta
+    \label{eqn-area2}    
+\end{equation}
+
+Solving for $s_2$ using equations \ref{eqn:area-constraint}, \ref{eqn-area1} and \ref{eqn-area2}
+\begin{equation}
+\begin{array}{llcl}
+     & \dfrac{1}{2} \dfrac{h^2}{\tan \, \theta}  & = & \dfrac{1}{2} s_2 \left(l - \dfrac{h}{\tan \, \theta} \right) \sin \, \theta  \\
+    %\implies & \dfrac{h^2}{\tan \, \theta}& =  & s_2 \left( l - \dfrac{h}{\tan \, \theta} \right) sin \theta \\
+    %\implies & s_2& = & \dfrac{h^2}{\sin \, \theta \left( l \: \tan \, \theta - h \right)} \\
+    \implies & s_2& = & \dfrac{h}{\sin \, \theta} . \: \dfrac{1}{ (l/h)\, \tan \, \theta - 1}
+\end{array}
+\end{equation}
+
+
+Finally $\mathit{PX}$ is computed as
+\begin{equation}
+\begin{array}{llcl}
+     &  \mathit{PX} & = & s_1 + s_2 \\
+     %& & = & \dfrac{h}{\sin \, \theta} +  h \: \left(\dfrac{h}{l}\right) \: \dfrac{1}{\sin \, \theta} \: \dfrac{1}{\tan \, \theta - \left( \dfrac{h}{l}\right)} \\
+    & & = & \dfrac{h}{\sin \, \theta} \:  \left( 1 +  \: \dfrac{1}{ (l/h)\, \tan \, \theta - 1} \right)\\
+\end{array}
+\end{equation}
+
+Let $l/h$ be denoted as the aspect ratio $AR$.
+\begin{equation}
+    \mathit{PX}  = \dfrac{h}{\sin \, \theta} \left( 1 + \dfrac{1}{AR\, \tan \, \theta - 1} \right)
+\end{equation}
+
+If the lengths of the adjacent edges $PQ$ and $PR$ are different, we would want to consider both the aspect ratios to calculate the length $PX$ and then average it. This gives us
+\begin{equation}
+    \mathit{PX} = \dfrac{h}{2 \, \sin\, \theta} \left[ 2 + \dfrac{1}{AR_1\, \tan \, \theta - 1} + \dfrac{1}{AR_2\; \tan \, \theta - 1} \right]
+\end{equation}
+
+And the extrusion factor $f$ is simply $PX/h$
+\begin{equation}
+    f = \dfrac{1}{2 \, \sin \, \theta} \left[ 2 + \dfrac{1}{AR_1\, \tan \, \theta - 1} + \dfrac{1}{AR_2\, \tan \, \theta - 1} \right]
+\end{equation}
+
+Hence, the extrusion factor $f$ depends on the half included angle $\theta$ and the aspect ratios $AR_1 \text{ and } AR_2$ at the vertex. We use a couple of constraints while using this extrusion factor. First, we ensure that $A > cot \theta$, so that we never get negative values for $f$. Secondly, we limit the extrusion length at any vertex to be less than the minimum of the length of adjacent edges on the boundary. This is done because the extrusion factor can be  really large for small angles and small aspect ratios. Hence, to avoid generating skinny elements at concave corners of the mesh, we limit the extrusion length at any vertex such that the resultant aspect ratio at that vertex would always be more than 1. Figure \ref{fig-extrusionScaling} shows an example of scaling the extrusion length at the concave corner. Along with preventing layers to fold onto themselves, this technique also helps in improving the quality of quad cells generated in the mesh.
+
+Extrusion length scaling works similar to the principle of hyperbolic meshing, where corners are raced towards the interior of the domain to make the successive layers more rounded. Immediate front collapses are avoided to a great extent for majority of the cases by using such scaling. However, if the corners are quite sharp ($<10^{\circ}$) or the refinement on the boundary curves is not sufficient (low Aspect Ratios), front collapses are inevitable. Hence, we implement a separate subroutine to handle such corner collisions in section *ref*.
+
+%One important assumption in this derivation is that $A_1$ and $A_2$ should be less than $tan\, \theta$. If this is not the case, we might get negative values for $f$.
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width = 0.9\linewidth]{img/m1/extrusionScaling/withoutScaling.png}
+\caption{}
+\label{subfigure-extrusionScaling1}
+\centering
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width = 0.9\linewidth]{img/m1/extrusionScaling/withScaling.png}
+\caption{}
+\label{subfigure-extrusionScaling2}
+\end{subfigure}
+\caption{Extrusion length scaling is illustrated using a concave corner. In (a), the layers are about to fold onto one another because of constant extrusion length at each layer. (b) shows the vertex at the corner having a larger scaled extrusion length so as to maintain higher quad quality and prevent layer collision.}
+\label{fig-extrusionScaling}
+\end{figure}
+
 \section{Front Recovery}
 
 
