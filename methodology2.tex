@@ -157,6 +157,6 @@ As discussed earlier, some exceptions exist in the advancing layer mesh where al
 
 Mesh smoothing is the process of improving the quality of the mesh. However, the context in which quality is referred to changes with the application of the mesh. One segment of the mesh smoothing techniques either proceed by filtering out noises of selected frequencies. Laplacian smoothing is the simplest example of such a smoothing technique. In a very simplistic Laplacian Smoothing technique, vertices on the mesh are moved towards the average position of its neighbours. Another implementation might consider moving the centroid of an element towards the average location of the centroids of the adjacent elements. In either of the cases, there is a filteration of high frequency undulations on the surface mesh. This causes loss of sharp features on the surface. Also, such a smoothing methodology results in shrinkage of the volume of the geometry which might not be desirable everywhere.
 
-Another segment of mesh smoothing methodology falls under the category of optimization by minimizing a given energy function in the mesh \cite{freitag1997tetrahedral, zhou2000angle, chen2004mesh}. Here, 
+Another segment of mesh smoothing methodology falls under the category of optimization by minimizing a given energy or error function in the mesh \cite{freitag1997tetrahedral, zhou2000angle, chen2004mesh, parthasarathy1991constrained, shephard1991automatic}. Here, a  
 
 combined - \cite{freitag1997combining, canann1998approach}
