@@ -4,7 +4,10 @@ In the previous chapter, we talked about how the very first layer of the mesh is
 
 We will start by discussing the subroutine used to control the aspect ratio as we advance several layers in the mesh. Combining triangular mesh elements to quad elements would be discussed next. Subsequently, mesh smoothing and collision handling would be discussed.
 
-\subsection{Edge Collapse and Sub-surface Interior Improvement}
+\section{Aspect Ratio Control and Sub-surface Interior Improvement}
+
+\subsection{Vertex Decimation on the Front}
+\label{aspectRatioControl}
 
 As the advancing front moves into the surface interior, the layers grow in size. This is done for the purpose of giving a higher refinement at the boundary curves. As the size of the layer grows, the aspect ratio of the mesh elements generated decrease. Also, some of the vertices on the front might come so close to each other that the aspect ratio approaches unity. Growing the layers further with all the vertices on the front would lead to anisotropy in the orthogonal direction  and/or front overlap. Hence, decimation of some of the front vertices is necessary to proceed with the next few layers.
 
@@ -32,20 +35,27 @@ As the advancing front moves into the surface interior, the layers grow in size.
 \label{edge-collapse}
 \end{figure}
 
-Once we have recovered the advancing front by iterative edge swaps to connect the kid points in the mesh, we check for vertices on the front that are too close to each other relative to the extrusion length. For instance, vertices which are near a concave corner could encroach each other if they are not decimated. Another example would be vertices on the advancing front which are far away from surface boundaries because the extrusion length has grown by this point. Decimating vertices from the front which are at a substantial distance from surface boundaries helps prevent the cell aspect ratio, ie front edge length over extrusion length, from dropping below one.
+Once we have recovered the advancing front by iterative edge swaps to connect the kid points in the mesh, we check for vertices on the front that are too close to each other relative to the extrusion length. For instance, vertices which are near a concave corner could encroach each other if they are not decimated. Another example of a situation where vertex decimation on the advancing front becomes necessary is when the front has advanced to a substantial distance from the surface boundaries. In such a case, the extrusion length on the front has grown so much that the aspect ratio approaches unity. Decimating vertices from the front which are at a substantial distance from surface boundaries helps prevent the cell aspect ratio, ie front edge length over extrusion length, from dropping below one.
 
-To check for vertices to decimate, we iterate through the vertices in the front and identify the ones which are too close to their neighbours. Vertex decimation is done through the edge-collapse routine as described in \cite{hoppe1994mesh}. The threshold edge length between two points on the front is set to be $2 \tan(\pi/8)$ times the average extrusion length at those points. This value is set so as to minimize the normalized maximum deviation of angle from $90^\circ$ for quad elements. Hence, the threshold ensures that the anisotropic properties are retained for several layers into the surface. All short edges on the front are collapsed using the edge-collapse algorithm. An example of an edge-collapse on the front is shown in Figure \ref{edge-collapse}. Here, two points $P_1$ and $P_2$ are collapsed into a single point which forms a part of the next front on the surface. Validation checks are made before collapsing an edge. The resultant triangles should not have a deviations of more than $50^{\circ}$ from the underlying surface.
-
-As the advancing front marches into the surface, vertices in the interior of the surface immediately next to the front are decimated to make way for the advancing layers. Before extruding a point on the advancing front, we check if any point in the surface interior with which it shares an edge agrees with the following condition. If it does, we decimate the interior vertex.
+To check for vertices to decimate, we iterate through the vertices in the front and identify the ones which are too close to their neighbours. Vertex decimation is done through the edge-collapse routine as described in \cite{hoppe1994mesh}. The threshold edge length between two points on the front is set to be $2 \tan(\pi/8)$ times the average extrusion length at those points. This value is set so as to minimize the normalized maximum deviation of angle from $90^\circ$ for quad elements. Hence, the threshold ensures that the anisotropic properties are retained for several layers into the surface. All short edges on the front are collapsed using the edge-collapse algorithm. An example of an edge-collapse on the front is shown in Figure \ref{edge-collapse}. Here, two points $P_1$ and $P_2$ are collapsed into a single point which forms a part of the next front on the surface. Mathematically,
 
 \begin{equation}
-    d < max \left(l_{1}/\sqrt{2}, \, l_{2}/\sqrt{2}, \, c\times \mathit{extrudeLength}\right)
-    \label{collapse-eq}
+l_{\mathit{collapse}} = 2 \cdot \; tan \left( \frac{pi}{8} \right) \cdot \; x_n \; ;
 \end{equation}
 
-Here $d$ is the distance between the point on the advancing front and the interior point, $l_1$ and $l_2$ are the lengths of adjacent edges of the point on the front, c is a constant whose value is set as $2$ and $extrudeLength$ is the extrusion length at the vertex on the front. This condition ensures decimation of vertices in the surface interior which are close to the advancing front and avoids any encroachment of surface interior vertices on the advancing layers. Topological and geometrical checks are done before an edge can be collapsed. These include a threshold for the ratio of area of generated triangles and a limit on the dihedral angle between the adjacent triangles created by the collapse. The area threshold is set to be $10^8$. Also, edge-collapse is successful only if the triangles resulting from it are be within a limit of $\theta < 30^{\circ}$ from the surface(see Figure \ref{deviation-surface}). The threshold for the maximum dihedral angle between any two adjacent triangles that result from the edge-collapse is set to $40^{\circ}$. The quality criterion used for edge collapse is again maximization of the minimum angle in the triangles thus produced. The best edge for collapse is chosen when decimating the interior vertices using this quality criterion. This is in contrast to the vertex decimation on the advancing front where the candidate edge for collapse is already identified. An illustrative example for surface interior vertex decimation can be seen in Figure \ref{interior-vert-collapse}.
+where $l_{\mathit{collapse}}$ is the minimum length of an edge on the advancing front which will not be considered for edge collapse and $x_n$ is the extrusion length at the $n^{th}$ layer.
+
+%Validation checks are made before collapsing an edge. The deviation of the triangles formed as a result of edge collapse from the underlying surface is constrained to be less than $30^{\circ}$ to limit the deviation of the mesh from the ground truth surface $S$. 
+
+Topological and geometrical checks are done before an edge can be collapsed in the mesh. These include a threshold for the ratio of area of generated triangles and a limit on the dihedral angle between the adjacent triangles created by the collapse. The area threshold is set to be $10^8$. Also, edge-collapse is successful only if the triangles resulting from it are be within a limit of $\theta < 30^{\circ}$ from the surface(see Figure \ref{deviation-surface}). The threshold for the maximum dihedral angle between any two adjacent triangles that result from the edge-collapse is set to $40^{\circ}$. 
 
 After we have a recovered the front and decimated encroaching vertices in the surface interior as well as on the advancing front through edge collapse, we queue up the immediate interior edges of the surface and swap them for maximizing mesh quality. This step is included so that we have a good interior triangulation at each step of the advancing layer routine. This step ensures that we do not have bad triangles causing problems as we continue to march.
+
+The edge collapse subroutine on the advancing front helps in controlling the aspect ratio at the front and limit its minimum value to 1. Once the aspect ratio has approached a value of $1$ on the front, layers will continue to extrude without growth in their size. Additionally, at concave corners with low aspect ratios, the edge collapse subroutine helps in maintaining a valid front to continue marching towards surface interior.
+
+\subsection{Vertex Decimation in Sub-Surface Interior}
+
+As discussed in the previous chapter, we follow a closed advancing front methodology to generate the anisotropic surface mesh. The input triangulation $T$, which is the encoding of the surface $S$ is taken to be the initial mesh. Such a technique helps us in maintaining a complete and valid surface mesh at each step in the mesh generation process. However, this means that we need to do some additional work in deleting the vertices on the sub-surface imported initially which are no longer required to be a part of the anisotropic surface mesh. Fortunately, we have all the connectivity information of the vertices on the front. This means that we do not have to scan the 3D space near the vertex to find the encroaching points. Checking the vertices in surface interior which share an edge with the front vertex is sufficient.
 
 \begin{figure}[hbt!]
 \centering
@@ -73,6 +83,80 @@ After we have a recovered the front and decimated encroaching vertices in the su
   \caption{}
   \label{cc4}
 \end{subfigure}
-\caption{Interior vertex decimation through edge collapse. The highlighted line shows the advancing front. In (a), vertex $P_2$ is about to encroach the front. Hence, the best vertex for collapse is chosen among its neighbours. The best vertex for edge collapse here is $P_1$. Hence, $P_2$ is collapsed on to $P_1$. The connectivity after the edge collapse is shown in (b) where vertex $P$ represents the collapsed vertex. Similarly, in (c), vertex $P_2$ is about to encroach the advancing front and is collapsed onto vertex $P_1$ which is on the advancing front itself. The new connectivity is shown in (d) where all the possibly encroaching vertices for the advancing layer are decimated.}
+\caption{Interior vertex decimation through edge collapse. The highlighted white line shows the advancing front. In (a), vertex $P_2$ is about to encroach the front. Hence, the best vertex for collapse is chosen among its neighbours. The best vertex for edge collapse here is $P_1$. Hence, $P_2$ is collapsed on to $P_1$. The connectivity after the edge collapse is shown in (b) where vertex $P$ represents the collapsed vertex. Similarly, in (c), vertex $P_2$ is about to encroach the advancing front and is collapsed onto vertex $P_1$ which is on the advancing front itself. The new connectivity is shown in (d) where all the possibly encroaching vertices for the advancing layer are decimated.}
 \label{interior-vert-collapse}
 \end{figure}
+
+In other words, as the advancing front marches into the surface, vertices in the interior of the surface immediately next to the front are decimated to make way for the advancing layers. Before extruding a point $P$ on the advancing front, we check if any point in the surface interior with which it shares an edge agrees with the following condition. If it does, we decimate the interior vertex.
+
+\begin{equation}
+    d < max \left( \frac{l_{1}}{\sqrt{2}}, \, \frac{l_{2}}{\sqrt{2}}, \; c \cdot  \mathit{x_n}\right)
+    \label{collapse-eq}
+\end{equation}
+
+Here $d$ is the distance between the point on the advancing front and the interior point, $l_1$ and $l_2$ are the lengths of adjacent front edges of the point on the front, c is a constant whose value is set as $2$ and $x_n$ is the extrusion length at the vertex on the $n^{th}$ front. This condition ensures decimation of vertices in the surface interior which are close to the advancing front and avoids any encroachment of surface interior vertices on the advancing layers. 
+
+Validation checks for front edge collapse mentioned in the last subsection are also run during interior edge collapse. The quality criterion used for interior edge collapse is maximization of the minimum angle in the triangles thus produced. The best edge for collapse is chosen when decimating the interior vertices using this quality criterion. This is in contrast to the vertex decimation on the advancing front where the candidate edge for collapse is already identified. An illustrative example for surface interior vertex decimation can be seen in Figure \ref{interior-vert-collapse}.
+
+\section{Combining Triangular Elements to Quadrilateral Elements}
+
+In section \ref{sec-simplicial}, we discussed about the pros and cons of simplical and non-simplical mesh elements. Then, in section \ref{consolidate-motivation}, we talked about the motivation to produce a hybrid surface mesh which consists of both simplical and non-simplical mesh elements. Briefly, a hybrid anisotropic surface mesh which consists primarily of quadrilateral elements with a small number of triangular elements gives us the flexibility to mesh topologically complex surface geometries while keeping the average vertex connectivity of the mesh to a low value.
+
+Almost all vertices in our closed advancing front method have a parent-kid relationship. The successor of a vertex is called its kid while the predecessor is called the parent. There are a couple of exceptions to this. First, vertices on the boundary curve do not have a parent as they are the zeroth layer of the mesh. Second, wherever an edge collapse operation is done, two kids from two different parent vertices collapse into a single vertex. This leaves a kid vertex with two parents, or, in other words, a two parents who share a common kid vertex.
+
+\vspace{10pt}
+\begin{figure}[hbt!]
+\centering
+\begin{subfigure}{\textwidth}
+  \centering
+  \includegraphics[width=.7\linewidth]{img/m2/combineTriToQuad.eps}
+  \caption{}
+  \label{triToQuad1}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+  \centering
+  \includegraphics[width=.7\linewidth]{img/m2/combineTriToQuad2.eps}
+  \caption{}
+  \label{triToQuad2}
+\end{subfigure}
+\caption{}
+\label{triToQuad}
+\end{figure}
+
+Apart from the two exceptions just mentioned, all the vertices have a parent and a kid. This gives some structure to our mesh. As the layers grow in the normal direction to the boundary curve, this helps us in generating rectangular quadrilateral elements easily. Edges are removed from the finished layers so as to generate superior quality quadrilateral cells. As the layers advance from the boundary curves towards the tangential direction onto the surface, the quadrilateral elements generated retain the boundary topology several layers into the interior of the surface. The quality of a quadrilateral element is calculated as the inverse of the maximum deviation of its interior angles from 90 degrees. This criterion is selected so as to prefer rectangular elements and retain the boundary representation on the surface mesh. Starting from the first layer generated on the surface, multiple iterations of this subroutine are run for the same layer to ensure as few triangular elements are left per layer as possible.
+
+Consider Figure \ref{triToQuad1}. $L_1$ and $L_2$ denote two successive layers on the advancing layer mesh. Points $p_1$ and $p_2$ are on the parent layer $L_1$ and their kids, $k_1$ and $k_2$, respectively, are on the kid layer $L_2$. All the edges in the neighbourhood of $p_1$ and $p_2$ which are not on the advancing front are queued. Then, these edges are sorted in order of the quality of the quadrilateral elements generated after their removal. Finally, all the edges in the queue are deleted until both the elements which share the edge are triangular. The edged marked in green color in the figure is deleted in the process which results in the deletion of two triangular elements and generation of a new quadrilateral element. The local mesh after edge removal is shown in Figure \ref{triToQuad2}.
+
+\vspace{10pt}
+\begin{figure}[hbt!]
+  \centering
+  \includegraphics[width=0.5\linewidth]{img/m2/combineTriToQuad3.eps}
+  \caption{•}
+  \label{triLeft}
+\end{figure}
+
+As discussed earlier, some exceptions exist in the advancing layer mesh where all the elements in a layer cannot be converted to a quadrilateral element. An illustration of such an exception is shown in Figure \ref{triLeft}. Here, two kids $k_1$ and $k_2$ had to collapse to a single vertex as the edge between them is collapsed in the aspect ratio control subroutine explained in section \ref{aspectRatioControl}. Hence, a triangle would be left in between layers $L_1$ and $L_22$. An example surface mesh which shows the result of the combine triangular elements to quadrilateral elements subroutine can be seen in Figure \ref{fig-triQuad}. Most of the triangular mesh elements are converted to quadrilateral elements save a few.
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=0.9\linewidth]{img/m2/combine-tris-to-quads/combineTrisToQuads1.eps}
+\caption{}
+\label{fig-triQuad1}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width =0.9\linewidth]{img/m2/combine-tris-to-quads/combineTrisToQuads2.eps}
+\caption{}
+\label{fig-triQuad2}
+\end{subfigure}
+\caption{Combining triangular cells to quadrilateral cells based on the quality of the quadrilateral cells generated. For any given quadrilateral element, the inverse of the maximum deviation of its interior angles from 90$^\circ$ is adopted as the measure of quality.}
+\label{fig-triQuad}
+\end{figure}
+
+\section{Mesh Smoothing}
+
+Mesh smoothing is the process of improving the quality of the mesh. However, the context in which quality is referred to changes with the application of the mesh. One segment of the mesh smoothing techniques either proceed by filtering out noises of selected frequencies. Laplacian smoothing is the simplest example of such a smoothing technique. In a very simplistic Laplacian Smoothing technique, vertices on the mesh are moved towards the average position of its neighbours. Another implementation might consider moving the centroid of an element towards the average location of the centroids of the adjacent elements. In either of the cases, there is a filteration of high frequency undulations on the surface mesh. This causes loss of sharp features on the surface. Also, such a smoothing methodology results in shrinkage of the volume of the geometry which might not be desirable everywhere.
+
+Another segment of mesh smoothing methodology falls under the category of optimization by minimizing a given energy or error function in the mesh \cite{freitag1997tetrahedral, zhou2000angle, chen2004mesh, parthasarathy1991constrained, shephard1991automatic}. Here, a  
+
+combined - \cite{freitag1997combining, canann1998approach}
