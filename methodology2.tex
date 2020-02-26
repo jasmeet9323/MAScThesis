@@ -155,8 +155,72 @@ As discussed earlier, some exceptions exist in the advancing layer mesh where al
 
 \section{Mesh Smoothing}
 
-Mesh smoothing is the process of improving the quality of the mesh. However, the context in which quality is referred to changes with the application of the mesh. One segment of the mesh smoothing techniques either proceed by filtering out noises of selected frequencies. Laplacian smoothing is the simplest example of such a smoothing technique. In a very simplistic Laplacian Smoothing technique, vertices on the mesh are moved towards the average position of its neighbours. Another implementation might consider moving the centroid of an element towards the average location of the centroids of the adjacent elements. In either of the cases, there is a filteration of high frequency undulations on the surface mesh. This causes loss of sharp features on the surface. Also, such a smoothing methodology results in shrinkage of the volume of the geometry which might not be desirable everywhere.
+Mesh smoothing is the process of improving the quality of the mesh. However, the context in which quality is referred to changes with the application of the mesh. Diffusion of mesh elements might be a desirable effect of mesh smoothing in one application and might not be a desirable effect in yet another application. One segment of the mesh smoothing techniques either proceed by filtering out noises of selected frequencies. Laplacian smoothing is the simplest example of such a smoothing technique. In a very simplistic Laplacian Smoothing technique, vertices on the mesh are moved towards the average position of its neighbours. Another implementation considers moving the centroid of an element towards the average location of the centroids of the adjacent elements. In either of the cases, there is a filteration of high frequency undulations on the surface mesh. This causes loss of sharp features on the surface. Also, such a smoothing methodology results in shrinkage of the volume of the geometry which might not be desirable everywhere.
 
-Another segment of mesh smoothing methodology falls under the category of optimization by minimizing a given energy or error function in the mesh \cite{freitag1997tetrahedral, zhou2000angle, chen2004mesh, parthasarathy1991constrained, shephard1991automatic}. Here, a  
+Another segment of mesh smoothing methodology falls under the category of optimization by minimizing a given energy or error function in the mesh \cite{freitag1997tetrahedral, zhou2000angle, chen2004mesh, parthasarathy1991constrained, shephard1991automatic}. Here, a 
 
 combined - \cite{freitag1997combining, canann1998approach}
+
+For our mesh generation scheme, we choose a physically-based smoothing technique. The mesh vertices (or nodes) on the mesh exert forces on adjacent nodes. Subsequently, the mesh nodes move so as to balance out these forces and reach a local force balance equilibrium. This method of smoothing is also referred to as spring-based smoothing methodology as each edge (or link) in the mesh acts as a spring which pushes or pulls its end points away or towards each other.
+
+Choosing a spring-based smoothing methodology gives us freedom to select the proportion of forces applied in the extrusion direction and along the advancing layer direction. The proportion can be changed by changing the spring constant of the springs associated with the edges in either direction. Several spring forces are applied to a given mesh node in the smoothing procedure. Each spring constant is denoted by $k_{spring}$. The forces are:
+
+
+\begin{itemize}
+\item \textbf{Parent force} - force which keeps the distance of the vertex to its parent (from which it was extruded) closer to the initial extrusion length, $\mathit{l_{ideal}}$ between the two.
+\begin{equation}
+\mathit{f_{parent}} = \mathit{k_{extrusion}} \cdot \frac{l_{real} - l_{ideal}}{l_{real} + l_{ideal}} \cdot \norm{ \vec{p} - \vec{v}}
+\end{equation}
+\item \textbf{Kid force} - similar to the parent force, this one keeps the distance between the node and its kid closer to the initial extrusion length.
+\begin{equation}
+\mathit{f_{kid} = k_{extrusion} * \frac{l_{real} - l_{ideal}}{l_{real} + l_{ideal}} * \norm{\vec{k} - \vec{v}}}
+\end{equation}
+\item \textbf{Neighbour force} - force to maintain uniform spacing of mesh nodes for each layer.
+\begin{equation}
+\mathit{f_{neighbour} = k_{neighbour} \cdot \frac{(\vec{v} - \vec{l}) + (\vec{v}- \vec{r})}{ 2.0}}
+\end{equation}
+\item \textbf{Original location} - a force is added to restrict the movement of the vertex from the location at which it was placed in the mesh before smoothing. This term also ensures that the deviation of the mesh nodes from the initial surface representation is as little as possible.
+\begin{equation}
+\mathit{f_{original} = k_{original} \cdot (\vec{v}- \vec{v'})}
+\end{equation}
+\end{itemize}
+
+These forces are summed up to give the mesh node a resultant force and the node is moved according to the total force. Several iterations (around 5-10) of smoothing are done per layer as the mesh advances towards surface interior. A limit is set to the vertex movement per smoothing iteration. The distance a vertex moves per iteration of the smoothing algorithm is kept at $5\%$ of the extrusion length at that vertex. This helps in limiting the movement of the vertex when the initial boundary discretization is too coarse. The limitation of choosing a spring-based smoothing technique is that we have to carefully identify the spring constants, $\mathit{k_{spring}}$ for our algorithm. However, once these constants are identified, they seem to work reasonably well for all the cases that we run. The value of $\mathit{k_{extrusion}}$ we use is 0.01, $k_{neighbour}$ is kept at 0.02 and $\mathit{k_{original}}$ at 0.1. Figure \ref{fig-smoothing-cylinder} shows an advancing layer surface mesh with and without smoothing applied to the mesh vertices. It can be seen that smoothing helps improve the vertex spacing along the advancing layer, thereby making the aspect ratio more uniform at a given front.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.4\linewidth]{img/m2/smoothing/smoothing-comparison-cylinder-cap.eps}
+\caption{Zoomed in view of smoothing applied to an advancing layer surface mesh. Dark blue lines represent the smoothed mesh and flat red lines represent the mesh without smoothing. We can see that the smoothed version of the mesh helps to attain uniform aspect ratio at each layer.}
+\label{fig-smoothing-cylinder}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,13 +6,13 @@ In this section, we will talk about the initial import of surface triangulation 
 
 \subsection{Surface Representation - A brief overview}
 
-Surfaces can be represented in various forms. A surface could be represented by an explicit equation such as the one shown below.
+Surfaces can be represented in various forms. A surface could be represented by an explicit equation such as
 
 \begin{equation}
 z = F(x,y)
 \end{equation}
 
-Where the coordinate $z$ can be found by solving the aforementioned explicit equation, given the remaining two coordinates $x$ and $y$.  Explicit form of surfaces are easy to trace. However, it is not very versatile. Surfaces could also be represented with their implicit form, given by an implicit equation such as the one shown below.
+where the coordinate $z$ can be found by solving the aforementioned explicit equation, given the remaining two coordinates $x$ and $y$. The explicit form of a surfaces is easy to trace. However, it is not very versatile. ***Write shortcomings***. Surfaces can also be represented with their implicit form, given by
 
 \begin{equation}
 F(x, y, z) = 0
@@ -48,7 +48,7 @@ In vector notation, the parametric surface can be specified by a vector-valued f
 \mathbf{r}=\mathbf{r}(u, v)
 \end{equation}
 
-The parametric representation of surfaces is the most versatile out of the three. It is axis independent and is highly flexible in terms of defining complex intersections and point classification. It is generally easier to manipulate free-form shapes in parametric form than implicit or explicit forms  \cite{patrikalakis2009shape}. Hence, most of the CAD packages use parametric form of the surfaces to manipulate them. Bezier surface patch is one example of parametric form of a surface. 
+The parametric representation of surfaces is the most versatile out of the three. It is axis independent and is highly flexible in terms of defining complex intersections and point classification. It is generally easier to manipulate free-form shapes in parametric form than implicit or explicit forms  \cite{patrikalakis2009shape}. Hence, most CAD packages use the parametric form of surfaces. Bezier surface patch and NURBS are examples of the parametric form of a surface.
 
 \subsection{Surface File Format}
 
@@ -60,7 +60,7 @@ The parametric representation of surfaces is the most versatile out of the three
   \label{fig-tesellation}
 \end{figure}
 
-Given a free-form 3D surface geometry, various CAD packages could be used to encode it and store it in a file. Encoding the geometry using an approximate mesh is one of the most common methods adopted to store a surface geometry. An approximate mesh is created by covering the surface geometry with a series of tiny imaginary polygons. Trianlges are the most common polygon used for mesh generation. The encoded surface mesh can be stored in a file for sharing and future reference purposes. These files store the vertices of the triangles as well as the outward normal directions to the triangles. This process of tiling a surface with non-overlapping geometric shapes is also known as tessellation. Hence, the file formats used for storing the surface representation are called tessellated formats.
+Given a free-form 3D surface geometry, various CAD packages could be used to encode it and store it in a file. Encoding the geometry using an approximate mesh is one of the most common methods adopted to store a surface geometry. An approximate mesh is created by covering the surface geometry with a series of tiny imaginary polygons. Triangles are the most common polygon used for mesh generation. The encoded surface mesh can be stored in a file for sharing and future reference purposes. These files store the vertices of the triangles as well as the outward normal directions to the triangles. This process of tiling a surface with non-overlapping geometric shapes is also known as tessellation. Hence, the file formats used for storing the surface representation are called tessellated formats.
 
 Due to the independent development of various CAD packages, a plethora of surface file formats are present in the mesh generation ecosystem. Many of these formats, such as DWG file format by AutoCAD and BLEND file format by Blender are proprietary. Hence, many of these cannot be shared between people working on different CAD packages. Native file formats are used to solve this problem. These formats can be shared easily among people working on different meshing softwares. One of the most common neutral surface file format is the STL (STereoLithography) file format. This format is compatible with most of the CAD and visualization softwares. Hence, we use the STL file format to import the surface geometry into our mesh generation algorithm.
 
