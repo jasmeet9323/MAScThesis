@@ -1,6 +1,6 @@
 \chapter{Methodology Part 2: Advancing Several Layers}
 
-In the previous chapter, we talked about how the very first layer of the mesh is generated. Starting from the discussion of extruding one boundary vertex onto the sub-surface, we went on explained how all the vertices on the boundary curve of the sub-surface are extruded and subsequently, how the advancing front is recovered so as to move on to the next layer. We also talked about how extrusion length scaling at concave corners helps us avoid immediate front collapse and improves overall mesh quality. In this chapter, we are going to discuss some of the important subroutines which help complete the anisotropic surface mesh.
+In the previous chapter, we talked about how the very first layer of the mesh is generated. Starting from the discussion of extruding one boundary vertex onto the sub-surface, we discussed how all the vertices on the boundary curve of the sub-surface are extruded and subsequently, how the advancing front is recovered so as to move on to the next layer. We also talked about how extrusion length scaling at concave corners helps us avoid immediate front collapse and improves overall mesh quality. In this chapter, we are going to discuss some of the important subroutines which help complete the anisotropic surface mesh.
 
 We will start by discussing the subroutine used to control the aspect ratio as we advance several layers in the mesh. Combining triangular mesh elements to quad elements would be discussed next. Subsequently, mesh smoothing and collision handling would be discussed.
 
@@ -37,19 +37,19 @@ As the advancing front moves into the surface interior, the layers grow in size.
 
 Once we have recovered the advancing front by iterative edge swaps to connect the kid points in the mesh, we check for vertices on the front that are too close to each other relative to the extrusion length. For instance, vertices which are near a concave corner could encroach each other if they are not decimated. Another example of a situation where vertex decimation on the advancing front becomes necessary is when the front has advanced to a substantial distance from the surface boundaries. In such a case, the extrusion length on the front has grown so much that the aspect ratio approaches unity. Decimating vertices from the front which are at a substantial distance from surface boundaries helps prevent the cell aspect ratio, ie front edge length over extrusion length, from dropping below one.
 
-To check for vertices to decimate, we iterate through the vertices in the front and identify the ones which are too close to their neighbours. Vertex decimation is done through the edge-collapse routine as described in \cite{hoppe1994mesh}. The threshold edge length between two points on the front is set to be $2 \tan(\pi/8)$ times the average extrusion length at those points. This value is set so as to minimize the normalized maximum deviation of angle from $90^\circ$ for quad elements. Hence, the threshold ensures that the anisotropic properties are retained for several layers into the surface. All short edges on the front are collapsed using the edge-collapse algorithm. An example of an edge-collapse on the front is shown in Figure \ref{edge-collapse}. Here, two points $P_1$ and $P_2$ are collapsed into a single point which forms a part of the next front on the surface. Mathematically,
+To check for vertices to decimate, we iterate through the vertices on the front and identify the ones which are too close to their neighbours. Vertex decimation is done through the conventional edge-collapse subroutine as described in \cite{hoppe1994mesh}. The threshold edge length between two points on the front is set to be $2 \tan(\pi/8)$ times the average extrusion length at those points. This value is set so as to minimize the normalized maximum deviation of angle from $90^\circ$ for quad elements. Hence, the threshold ensures that the anisotropic properties are retained for several layers while marching onto the surface. All short edges on the front are collapsed using the edge-collapse algorithm. An example of an edge-collapse on the front is shown in Figure \ref{edge-collapse}. Here, two points $P_1$ and $P_2$ are collapsed into a single point which forms a part of the next front on the surface. Mathematically,
 
 \begin{equation}
 l_{\mathit{collapse}} = 2 \cdot \; tan \left( \frac{pi}{8} \right) \cdot \; x_n \; ;
 \end{equation}
 
-where $l_{\mathit{collapse}}$ is the minimum length of an edge on the advancing front which will not be considered for edge collapse and $x_n$ is the extrusion length at the $n^{th}$ layer.
+where $l_{\mathit{collapse}}$ is the minimum length of an edge on the advancing front which will not be considered for collapse and $x_n$ is the extrusion length at the $n^{th}$ layer.
 
 %Validation checks are made before collapsing an edge. The deviation of the triangles formed as a result of edge collapse from the underlying surface is constrained to be less than $30^{\circ}$ to limit the deviation of the mesh from the ground truth surface $S$. 
 
-Topological and geometrical checks are done before an edge can be collapsed in the mesh. These include a threshold for the ratio of area of generated triangles and a limit on the dihedral angle between the adjacent triangles created by the collapse. The area threshold is set to be $10^8$. Also, edge-collapse is successful only if the triangles resulting from it are be within a limit of $\theta < 30^{\circ}$ from the surface(see Figure \ref{deviation-surface}). The threshold for the maximum dihedral angle between any two adjacent triangles that result from the edge-collapse is set to $40^{\circ}$. 
+Topological and geometrical checks are done before an edge can be collapsed in the mesh. These include a threshold for the ratio of area of generated triangles and a limit on the dihedral angle between the adjacent triangles created by the collapse. The area threshold is set to be $10^8$. Also, edge-collapse is successful only if the triangles resulting from it are be within a limit of $\theta < 30^{\circ}$ from the surface (see Figure \ref{deviation-surface}). The threshold for the maximum dihedral angle between any two adjacent triangles that result from the edge-collapse is set to $40^{\circ}$. 
 
-After we have a recovered the front and decimated encroaching vertices in the surface interior as well as on the advancing front through edge collapse, we queue up the immediate interior edges of the surface and swap them for maximizing mesh quality. This step is included so that we have a good interior triangulation at each step of the advancing layer routine. This step ensures that we do not have bad triangles causing problems as we continue to march.
+After we have a recovered the front and decimated encroaching vertices in the surface interior as well as on the advancing front through edge collapse, we queue up the immediate interior edges of the surface and swap them for maximizing mesh quality. This step is included so that we have a good interior triangulation at each step of the advancing layer routine. It ensures that we do not have skinny triangles ahead of the front which might cause problems as we continue to march.
 
 The edge collapse subroutine on the advancing front helps in controlling the aspect ratio at the front and limit its minimum value to 1. Once the aspect ratio has approached a value of $1$ on the front, layers will continue to extrude without growth in their size. Additionally, at concave corners with low aspect ratios, the edge collapse subroutine helps in maintaining a valid front to continue marching towards surface interior.
 
@@ -87,7 +87,7 @@ As discussed in the previous chapter, we follow a closed advancing front methodo
 \label{interior-vert-collapse}
 \end{figure}
 
-In other words, as the advancing front marches into the surface, vertices in the interior of the surface immediately next to the front are decimated to make way for the advancing layers. Before extruding a point $P$ on the advancing front, we check if any point in the surface interior with which it shares an edge agrees with the following condition. If it does, we decimate the interior vertex.
+In other words, as the advancing front marches onto the surface, vertices in the interior of the surface immediately next to the front are decimated to make way for the advancing layers. Before extruding a point $P$ on the advancing front, we check if any point in the surface interior with which it shares an edge agrees with the following condition. If it does, we decimate the interior vertex.
 
 \begin{equation}
     d < max \left( \frac{l_{1}}{\sqrt{2}}, \, \frac{l_{2}}{\sqrt{2}}, \; c \cdot  \mathit{x_n}\right)
@@ -163,6 +163,13 @@ combined - \cite{freitag1997combining, canann1998approach}
 
 For our mesh generation scheme, we choose a physically-based smoothing technique. The mesh vertices (or nodes) on the mesh exert forces on adjacent nodes. Subsequently, the mesh nodes move so as to balance out these forces and reach a local force balance equilibrium. This method of smoothing is also referred to as spring-based smoothing methodology as each edge (or link) in the mesh acts as a spring which pushes or pulls its end points away or towards each other.
 
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{img/m2/smoothing/smoothing.eps}
+\caption{Smoothing Forces. Force $k_{parent}$ keeps the distance between the parent vertex $p$ and the current vertex $v$ close to ideal. Force $k_{kid}$ is a similar force which keeps the distance between the kid vertex $k$ and $v$ close to ideal. Force $f_{neighbour}$ pushes the vertex $v$ towards the center of the left and right vertices, $l$ and $r$, respectively.}
+\label{smoothingForces}
+\end{figure}
+
 Choosing a spring-based smoothing methodology gives us freedom to select the proportion of forces applied in the extrusion direction and along the advancing layer direction. The proportion can be changed by changing the spring constant of the springs associated with the edges in either direction. Several spring forces are applied to a given mesh node in the smoothing procedure. Each spring constant is denoted by $k_{spring}$. The forces are:
 
 
@@ -193,6 +200,107 @@ These forces are summed up to give the mesh node a resultant force and the node 
 \caption{Zoomed in view of smoothing applied to an advancing layer surface mesh. Dark blue lines represent the smoothed mesh and flat red lines represent the mesh without smoothing. We can see that the smoothed version of the mesh helps to attain uniform aspect ratio at each layer.}
 \label{fig-smoothing-cylinder}
 \end{figure}
+
+\section{Collision Handling}
+
+In our surface mesh generation scheme, we take several measures to avoid or delay front collisions. Extrusion length scaling subroutine, described in Section \ref{extrusionLengthScaling}, scales the extrusion length at a vertex on the front so as to output better quality quad cells at concave corners. This helps us delay front collisions at such sites in the mesh. Vertex decimation on the front, explained in section \ref{aspectRatioControl}, along with controlling aspect ratio, also helps avoid front collapse when two front vertices come sufficiently close to each other. Mesh smoothing, described in the last section also helps in avoiding front collapses to some extent. Inspite of undertaking such measures, front collapses at sharp concave corners and head on front collapses at mesh closure zones (where the fronts from two different regions of a sub-surface collide) are inevitable. Hence, subroutines for handling front collisions are important to get a complete surface mesh.
+
+The ways different advancing fronts in a surface mesh can collide can be classified into two categories. The first one is front collision near a sharp corner. Here, the advancing fronts from either sides of the sharp corner can collapse onto each other before even marching a single step. In the next section, we will discuss how the front collisions are handled in such cases. A second way in which fronts can collide is when two fronts from different regions of a sub-surface march until the point where they come sufficiently close to each other. If the fronts keep marching, front collision is inevitable and there needs to be a subroutine to stop the vertices which are in close proximity to other vertices on the front from marching further.
+
+\subsection{Collisions at Concave Corners}
+
+For concave corners of the mesh which might collide onto themselves, we preemptively close off the corner before the layers collide. Consider a concave corner as shown in figure \ref{fig-cornerCollision}. Point $A$ is a corner vertex at the mesh front $CAB$. The extrusion length at the front is $h$. The length of the edge $AB$ is $l$. If point $B$ is extruded with the current front definition, the extruded point $D$ would cross the angle bisector of $\angle BAC$, $AX$ and will invalidate the front. This is likely to occur for smaller aspect ratio ($\AR$)  values and small values of included angle $2 \, \theta$. To avoid collision in the next front, we insert a new point $F$ into the mesh, located at the surface projection of the mid-point of $B$ and $C$. $F$ takes the place of $A$ as a front vertex and this procedure is repeated until no point which is extruded from the front crosses the angle bisector of its neighbours. The value of angle $\theta$ where this occurs can be written as $\theta = \tan^{-1}(1/\AR)$, where $\AR$ is the aspect ratio at the corner vertex. Hence, we identify corner as any vertex on the front which has half interior angle $\theta$ less than a threshold times this limit.
+\begin{equation}
+\mathit{\theta_{corner} < threshold * \tan^{-1}(1/\AR)}
+\label{eqn-corner-threshold}
+\end{equation}
+
+The threshold is taken as 1.5 for our mesh generation method to resolve all corners collision instances.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.4]{img/m2/cornerCollision/cornerCollision.eps}
+\caption{Handling collision at concave corners to avoid layer overlap. Corner point $A$ is replaced by point $F$ so as to form the new front $CFB$. $F$ is the surface-projected mid-point of points $B$ and $C$. This corner collision handling is done until all the half-interior angles, $\theta$ are within the limit described by equation \ref{eqn-corner-threshold}.}
+\label{fig-cornerCollision}
+\end{figure}
+
+\subsection{Head-On Collisions}
+
+\begin{figure}[!hbt]
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{img/m2/meshCases/joint-x0.004-g1.04-a5/collapse1.eps}
+  \caption{}
+  \label{fig-collision1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{img/m2/meshCases/joint-x0.004-g1.04-a5/collapse2.eps}
+  \caption{}
+  \label{fig-collision2}
+\end{subfigure}
+\caption{Handling front collisions. (a) shows the advancing front which is about to collide onto itself. Using the vertex connectivity at the advancing layer and the proximity of the advancing layer vertices from each other, some of the front vertices are removed from the front and the front is redefined. The redefined front extruded to the next layer is shown in (b). From this iteration of the front, it would proceed with only the vertices on the front shown in red.}
+\label{fig-collision}
+\end{figure}
+
+Apart from handling collisions at the corners of the mesh, we also need to take care of the front collisions which happen elsewhere. Consider Figure \ref{fig-collision1} where the advancing layer surface mesh generation algorithm is meshing one of the surfaces of the geometry shown in Figure \ref{fig-surfSegment} . The advancing front is shown in red in the figure. After advancing several layers from the boundary, it reaches a point where it is about to collapse onto itself. Hence, some sort of front redefinition is necessary before moving on to the next layer. To achieve this, we first iterate through all the points in the front to identify the encroached points. These points are the ones whose distance from any edge in the front, except its adjacent edges, is less than a threshold (taken as $2.4$) times the extrusion length at that point. As our surface mesh is closed, we can utilize the vertex connectivity to find out the possible vertex-front edge encroachment. Hence, for a given point on the advancing front, only the edges on the front that share a triangle with that point are checked for encroachment. This saves a lot of computational cost while identifying encroached vertices. We assume that the input boundary discretization and surface triangulation are fine enough to resolve the complex features of the geometry, so that we don't have to iterate through all the edges on the front to find whether a given point is encroached or not.
+
+After these encroached points and their corresponding edges are identified, we reconnect the non-encroached points so as to form the new front. The encroached points are moved out of the advancing front and the front is hence redefined. In figure \ref{fig-collision2}, we show the redefined front extruded to the next layer. In this case, the front is divided into two loops, each of which continues to march independently towards the interior of the surface. After dealing with the concave corner collision cases, this approach helps us tackle front collisions at other regions of the front  and completes the front redefinition process wherever the advancing front might collide onto itself.
+
+The concave corner detection and front redefinition routine associated with it works well to close off the corners. However, the vertex placement at such concave corners is not ideal every time. It tends to produce skinny triangular elements if there are multiple corners adjacent to each other because of bad boundary discretization. Hence, this is a limitation of the current formulation. Figure \ref{fig-cornerLimitation} shows such a case. A zoomed in view of the trailing edge of an airfoil is shown. Two sharp corners at the boundary of the surface are successfully closed by the mesh and the front continues to advance towards the interior of the surface. However, the quality of the triangular elements generated is not ideal. Better vertex placement and a different smoothing subroutine for such vertices could produce better quality mesh elements for such cases.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.4\linewidth]{img/m2/cornerCollision/cornerLimitation.eps}
+\caption{Limitation of the concave corner collision detection and front redefinition subroutine. Zoomed in view of the trailing edge of an airfoil is shown. The subroutine successfully closes off the two concave corners present a the tip of the trailing edge, but produces a couple of skinny triangles in the mesh with non-ideal vertex placement.}
+\label{fig-cornerLimitation}
+\end{figure}
+
+\subsection{Overall Mesh Generation Algorithm}
+In the previous section, we have detailed the steps in the advancing layer mesh generation routine. Here, we summarize the algorithm in the form of a pseudo code in Algorithm \ref{algo}.
+
+\begin{algorithm}[hbt!]
+\caption{Overall Mesh Generation algorithm}\label{alg:euclid}
+\begin{algorithmic}[1]
+\Procedure{SurfMesh::CreateMesh}{triangulation $T,$ extrusion length, growth ratio}
+\State Create surface geometry $S \gets T$
+\State Initialize Advancing Layer $F$ from Surface Boundary
+\While{ $F\neq\emptyset$}\Comment{Advance until Front $F$ isn't empty}
+\State \textsc{AdvanceLayer($F$)}
+\State Validate the new Layer
+\EndWhile \label{advancing-layer-routine}
+\State Export \textsc{SurfMesh}
+\EndProcedure
+\Procedure{SurfMesh::AdvanceLayer}{$F$}
+\State Delete Encroaching Interior Vertices
+\State Redefine front $F$ Until No Vertex Encroachment
+\State Extrude All Points of $F$ and Insert Into Mesh
+\State Recover front $F'$ \Comment{Through forced edge creation between kid vertices}
+\State Improve Mesh Quality by Edge Swapping \Comment{In the immediate interior of mesh}
+\State Collapse Short Edges in the Front
+\State Combine triangular elements to quads
+\State Smooth Vertices
+\State Update Extrusion Length for vertices
+\EndProcedure
+\end{algorithmic}
+\label{algo}
+\end{algorithm}
+
+\section{Assumptions}
+
+We make a few assumptions on the input triangulation for our mesh generation algorithm to successfully create a valid mesh. The first one is that the triangulation of the surface is fine enough to resolve the geometric complexities in the object. If the input triangulation is too coarse, the encroaching interior vertex deletion subroutine will create mesh elements that deviate significantly from the surface or even fail. Hence, for highly curved regions of the surface, the input triangulation should be within 30 degrees deviation from the surface. However, this issue can be tackled by refining the triangulation using any isotropic refinement algorithm as long as it retains the features of the input object. Coarse triangulations are acceptable for objects without any geometric complexities.
+
+Another assumption we have made for the input triangulation is that it would have well defined boundaries where the advancing layers can march out from. Sharp corners in the input geometry are automatically identified as boundaries of the mesh but the boundary discretization of blunt corners needs to be supplied as an input to the advancing layer surface mesh generator.
+
+
+
+
+
+
+
+
+
 
 
 
