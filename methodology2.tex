@@ -222,6 +222,7 @@ We classify the ways in which two advancing fronts may collide into two categori
 \end{figure}
 
 \subsection{Collisions at Concave Corners}
+\label{collisionConcaveCorner}
 
 For concave corners of the mesh which might collide onto themselves, we preemptively close off the corner before the layers collide. Consider a concave corner as shown in figure \ref{fig-cornerCollision}. Point $A$ is a corner vertex at the mesh front $CAB$. The extrusion length at the front is $h$. The length of the edge $AB$ is $l$. If point $B$ is extruded with the current front definition, the extruded point $D$ would cross the angle bisector of $\angle BAC$, $AX$ and will invalidate the front. This is likely to occur for smaller aspect ratio ($\AR$)  values and small values of included angle $2 \, \theta$. To avoid collision in the next front, we insert a new point $F$ into the mesh, located at the surface projection of the mid-point of $B$ and $C$. $F$ takes the place of $A$ as a front vertex and this procedure is repeated until no point which is extruded from the front crosses the angle bisector of its neighbours. The value of angle $\theta$ where this occurs can be written as $\theta = \tan^{-1}(1/\AR)$, where $\AR$ is the aspect ratio at the corner vertex. Hence, we identify as corner as any vertex on the front which has half interior angle $\theta$ less than a threshold times this limit.
 \begin{equation}
