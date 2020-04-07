@@ -1,17 +1,17 @@
 \chapter{Methodology Part 1: Geometry Representation and Point Placement}
 
-In this section, we will talk about the initial import of surface triangulation and storing the surface as a collection of bezier surface patches. Then, the point placement subroutine is explained which decides the mesh element structure. Lastly, a small discussion on the local mesh element quality improvement is added to explain the face swapping algorithm. 
+In this section, we will talk about the initial import of surface triangulation and storing the surface as a collection of Bezier surface patches. Then, the point placement subroutine is explained which decides the mesh element structure. Lastly, a small discussion on the local mesh element quality improvement is added to explain the face swapping algorithm. 
 
 \section{Surface Import}
 
 \subsection{Surface Representation - A brief overview}
 
-Surfaces can be represented in various forms. A surfaces can be represented with their implicit form, given by
+Surfaces can be represented in various forms. A surface can be represented in implicit form, given by
 \begin{equation}
 F(x, y, z) = 0
 \label{implicitSurface}
 \end{equation}
-where, the surface is defined as the locus of points whose coordinates $(x, y, z)$ satisfly the above equation. If the equation \ref{implicitSurface} is linear in variables $x, y, and z$, it represents a plane. If the equation \ref{implicitSurface} is of second degree in $x, y, \textnormal{ or } z$, it represents quadrics. If the implicit equaiton can be solved for one of the variables as a function of of the other two, say $z$ is solved in terms of $x$ and $y$, we obtain an explicit surface
+where the surface is defined as the locus of points whose coordinates $(x, y, z)$ satisfy the above equation. If the Equation \ref{implicitSurface} is linear in variables $x$, $y$, and $z$, it represents a plane. If the equation \ref{implicitSurface} is of second degree in $x, y, \textnormal{ or } z$, it represents quadrics. If the implicit equation can be solved for one of the variables as a function of of the other two, say $z$ is solved in terms of $x$ and $y$, we obtain an explicit surface
 \begin{equation}
 z = F(x,y)
 \end{equation}
@@ -30,7 +30,7 @@ Figure \ref{fig-imex} shows an implicit and an explicit surface together with th
     \includegraphics[width=0.8\linewidth]{img/m1/implicit.png}
     \caption{}
   \end{subfigure}
-  \caption{(a) An explicit surface, given by $z = \cos ((x+y))+\frac{x^{2}}{6}-\frac{y^{2}}{6}$. (b) An implicit surface, given by $2 y\left(y^{2}-3 x^{2}\right)\left(1-z^{2}\right)+\left(x^{2}+y^{2}\right)^{2}-\left(9 z^{2}-1\right)\left(1-z^{2}\right)=0$. }
+  \caption[Explicit and implicit surfaces]{(a) An explicit surface, given by $z = \cos ((x+y))+\frac{x^{2}}{6}-\frac{y^{2}}{6}$. (b) An implicit surface, given by $2 y\left(y^{2}-3 x^{2}\right)\left(1-z^{2}\right)+\left(x^{2}+y^{2}\right)^{2}-\left(9 z^{2}-1\right)\left(1-z^{2}\right)=0$. }
   \label{fig-imex}
 \end{figure}
 
@@ -54,13 +54,13 @@ The parametric representation of surfaces is the most versatile out of the three
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{img/m1/tessellation.png}
-  \caption{The perfect spherical surface on the left is approximated by tessellations. The figure on the right uses big triangles, resulting in a coarse model. The figure on the center uses smaller triangles and achieves a smoother approximation \cite{fileFormat}}
+  \caption[Coarse and fine tesellation of a sphere]{The perfect spherical surface on the left is approximated by tessellations. The figure on the right uses big triangles, resulting in a coarse model. The figure on the center uses smaller triangles and achieves a smoother approximation \cite{fileFormat}}
   \label{fig-tesellation}
 \end{figure}
 
 Given a free-form 3D surface geometry, various CAD packages could be used to encode it and store it in a file. Encoding the geometry using an approximate mesh is one of the most common methods adopted to store a surface geometry. An approximate mesh is created by covering the surface geometry with a series of tiny imaginary polygons. Triangles are the most common polygon used for mesh generation. The encoded surface mesh can be stored in a file for sharing and future reference purposes. These files store the vertices of the triangles as well as the outward normal directions to the triangles. This process of tiling a surface with non-overlapping geometric shapes is also known as tessellation. Hence, the file formats used for storing the surface representation are called tessellated formats.
 
-Due to the independent development of various CAD packages, a plethora of surface file formats are present in the mesh generation ecosystem. Many of these formats, such as DWG file format by AutoCAD and BLEND file format by Blender\cite{blender} are proprietary. Hence, many of these cannot be shared between people working on different CAD packages. Neutral file formats are used to solve this problem. These formats can be shared easily among people working on different meshing software. One of the most common neutral surface file formats is the STL (STereoLithography) file format. This format is compatible with most of the CAD and visualization softwares. Hence, we use the STL file format to import the surface geometry into our mesh generation algorithm.
+Due to the independent development of various CAD packages, a plethora of surface file formats is present in the mesh generation ecosystem. Many of these formats, such as DWG file format by AutoCAD and BLEND file format by Blender\cite{blender} are proprietary. Hence, many of these cannot be shared between people working on different CAD packages. Neutral file formats are used to solve this problem. These formats can be shared easily among people working on different meshing software. One of the most common neutral surface file formats is the STL (STereoLithography) file format. This format is compatible with most CAD and visualization software. Hence, we use the STL file format to import the surface geometry into our mesh generation algorithm.
 
 An STL file stores the surface as a triangulated mesh. The following information is stored for all the triangles in the STL file format:
 
@@ -69,15 +69,15 @@ An STL file stores the surface as a triangulated mesh. The following information
   \item The components of the unit normal vector to the triangle pointing outwards with respect to the 3D model
 \end{enumerate}
 
-Innumerable software packages are available online which can be used to triangulate a surface (see \cite{meshSoftware} for a list of such software). A fine triangular mesh can be considered as an approximate encoding of a given surface geometry. The approximation could be improved by increasing the number of triangles or decreasing their size. However, using smaller triangles results in larger number of triangles needed to tile the surface. This increases the mesh file size. Hence, a user should define the mesh element size according to the kind of refinement needed.
+Innumerable software packages are available online which can be used to triangulate a surface (see \cite{meshSoftware} for a list of such software). A fine triangular mesh can be considered as an approximate encoding of given surface geometry. The approximation could be improved by increasing the number of triangles or decreasing their size. However, using smaller triangles results in a larger number of triangles needed to tile the surface. This increases the mesh file size. Hence, a user should define the mesh element size according to the level of refinement needed.
 
 \section{Surface Import and Segmentation using the Common Geometry Module (CGM)}
 
-As explained in Section \ref{surfaceFileFormat}, we import the surface geometry as a triangulation from an STL file. The Common Geometry Module (CGM) package is used to read the surface file and store the triangulation for further processing. The triangulated surface is stored as a collection of segmented sub-surfaces. The segmentation in CGM is done by identifying features in the surface. The only input parameter for surface segmentation accepted by CGM is the feature angle. We keep this feature angle value to be 135{$^\circ{}$}. This value helps us to identify sharp corners and edges on the surface. Figure \ref{fig-surfSegment} shows a surface triangulation of an arbitrary mechanical part. The surface triangulation is segmented into 10 sub-surfaces, which are identified by the sharp features on the surface. Four of these are shown in outline in the figure.
+As explained in Section \ref{surfaceFileFormat}, we import the surface geometry as a triangulation from an STL file. The Common Geometry Module (CGM) package is used to read the surface file and store the triangulation for further processing. The triangulated surface is stored as a collection of segmented sub-surfaces. The segmentation in CGM is done by identifying features on the surface. The only input parameter for surface segmentation required by CGM is the feature angle. We keep this feature angle value to be 135{$^\circ{}$}. This value helps us to identify sharp corners and edges on the surface. Figure \ref{fig-surfSegment} shows a surface triangulation of an arbitrary mechanical part. The surface triangulation is segmented into 10 sub-surfaces, which are identified by the sharp features on the surface. Four of these are shown in outline in the figure.
 
-Each triangle imported in CGM is stored as a quartic-Bezier patch. We will refer to the imported triangulation as $T$ and the underlying Bezier surface representation as $S$. The underlying Bezier surface representation $S$ is considered to be the ground truth for the surface mesh and the mesh points are placed directly over $S$. The initial imported triangulation $T$ is taken as the initial mesh. 
+Each triangle imported in CGM is stored as a quartic Bezier patch. We will refer to the imported triangulation as $T$ and the underlying Bezier surface representation as $S$. The underlying Bezier surface representation $S$ is considered to be the ground truth for the surface mesh and the mesh points are placed directly over $S$. The initial imported triangulation $T$ is taken as the initial mesh. 
 
-Using $T$ as our initial mesh means that we can use a closed advancing layer mesh generation methodology. There are advantages and disadvantages of using such a methodology. Open advancing layer method requires less work overall to generate the mesh as there are no points to delete or reconnect to, ahead of the front. On the other hand, handling mesh layer collisions is  more tricky in open advancing layer method as no connectivity information is available ahead of the front in such methods. This leads to abrupt layer closures, which are undesirable in an anisotropic mesh.
+Using $T$ as our initial mesh means that we can use a closed advancing layer mesh generation methodology. There are advantages and disadvantages of using such a methodology. The open advancing layer method requires less work overall to generate the mesh as there are no points to delete or reconnect to, ahead of the front. On the other hand, handling mesh layer collisions is  more tricky in an open advancing layer method as no connectivity information is available ahead of the front in such methods. This leads to abrupt layer closures, which are undesirable in an anisotropic mesh.
 
 Closed advancing layer mesh generation method generates a valid surface mesh at any given point in time during the mesh generation process. Hence, there is more flexibility in terms of when to stop the marching layers and output the mesh in its current state. Additionally, connectivity information is known ahead of the front. This information is helpful while tackling front collisions. This will be explained in more detail when we talk about handling front collisions in *ref*.
 
@@ -107,7 +107,7 @@ Closed advancing layer mesh generation method generates a valid surface mesh at 
   \caption{}
   \label{surf3}
 \end{subfigure}
-\caption{An example input triangulation of an arbitrary mechanical part. Four of the segmented surfaces are outlined.}
+\caption[Surface segmentation of a mechanical part geometry.]{An example input triangulation of an arbitrary mechanical part. Four of the segmented surfaces are outlined.}
 \label{fig-surfSegment}
 \end{figure}
 
@@ -117,13 +117,13 @@ Sharp features of the imported surface are used by CGM to segment the surface. T
 
 Picking the boundary curves of the sub-surfaces to serve as the initial front helps us create anisotropy normal to these boundary curves. This way, desired refinement can be obtained normal to these boundary curves, which is a desirable feature as these boundary curves define the surface features.
 
-The discretization of the boundary curves imported along with the surface triangulation defines the refinement and gradation along the boundary curves (or along the zeroth front). Hence, the refinement and gradation along the boundary curves of the surface is defined by the input triangulation and is up to the user to vary. The surface mesh generated by EDAMSurf hence provides with anisotropy along the normal direction (on the surface) to these boundary curves of the sub-surfaces.
+The discretization of the boundary curves imported along with the surface triangulation defines the refinement and gradation along the boundary curves (or along the zeroth front). Hence, the refinement and gradation along the boundary curves of the surface is defined by the input triangulation and is up to the user to vary. The surface mesh generated by EDAMSurf provides anisotropy along the normal direction (on the surface) to these boundary curves of the sub-surfaces.
 
-We chose the boundary curves identified by CGM to serve as the zeroth layer of EDAMSurf. However, the initial front could be chosen to be something else without affecting the rest of the mesh generation procedure. For eg. curves along high principal curvature directions on the surface could be added to the zeroth layer of the mesh to get the required anisotropy along highly curved regions of the surface. This is a work in progress and will be added to EDAMSurf in the future.
+We chose the boundary curves identified by CGM to serve as the zeroth layer of EDAMSurf. However, the initial front could be chosen to be something else without affecting the rest of the mesh generation procedure. For example, curves along high principal curvature directions on the surface could be added to the zeroth layer of the mesh to get the required anisotropy along highly curved regions of the surface. This is a work in progress and will be added to EDAMSurf in the future.
 
 \section{Point Placement}
 
-After importing the surface triangulation, we have a valid underlying surface representation with us. Also, segmented sub-surfaces and their boundaries curves provide us with the boundaries we need to march off of. Each vertex on these boundary curves is extruded in two directions, one each for the sub-surfaces which share the boundary point. To make things simpler, two copies of each boundary vertex (a vertex on a boundary curve) are created and associated with the two sub-surfaces which share the vertex. This untangles the process of generating the surface mesh of the two sub-surfaces, which can now be meshed independently. Later, when we need to output the final surface mesh, these copies of vertices are recombined.
+After importing the surface triangulation, we have a valid underlying surface representation. Also, segmented sub-surfaces and their boundaries curves provide us with the boundaries we need to march off of. Each vertex on these boundary curves is extruded in two directions, one each for the sub-surfaces which share the boundary point. To make things simpler, two copies of each boundary vertex (a vertex on a boundary curve) are created and associated with the two sub-surfaces which share the vertex. This untangles the process of generating the surface mesh of the two sub-surfaces, which can now be meshed independently. Later, when we need to output the final surface mesh, these copies of vertices are recombined.
 
 Meshing sub-surfaces independently has several advantages. If one sub-surface mesh fails to generate, other sub-surfaces would still continue to generate the advancing layer mesh. Different layer on layer \textit{growth ratios} can be used for different sub-surfaces, hence providing the flexibility to choose different anisotropy  for each sub-surface. Also, parallelisation of the surface mesh generation subroutine would be simpler. From here onwards,  the discussion would focus on generating the mesh for a single sub-surface, which is a segment of the complete surface. 
 
@@ -172,11 +172,11 @@ For each of the sub-surfaces of the geometry, the advancing layer routine iterat
 	\caption{}
 	\label{fig-pointPlacement4}
 \end{subfigure}
-\caption{(a) Calculation of the extrusion direction of vertex P at the boundary curve of the sub-surface. (b) Projection of the extruded vertex $K$ onto the underlying surface. The projected vertex is marked $Q$. (c) Insertion of the new vertex $Q$ in the triangulation $T$. Red dotted lines denote the new edges created in the mesh. (d) One of the edges next to $Q$ is swapped so as to improve the quality of the mesh.}
+\caption[Extrusion direction calculation and vertex insertion.]{(a) Calculation of the extrusion direction of vertex P at the boundary curve of the sub-surface. (b) Projection of the extruded vertex $K$ onto the underlying surface. The projected vertex is marked $Q$. (c) Insertion of the new vertex $Q$ in the triangulation $T$. Red dotted lines denote the new edges created in the mesh. (d) One of the edges next to $Q$ is swapped so as to improve the quality of the mesh.}
 \label{fig-point}
 \end{figure}
 
-In the first step, we extrude the parent point to get the extruded point. We would interchangeably call the extruded points as the kid points as they represent the successors of their parent points from the previous layer. The direction of this extrusion is set up to be the average of the normals of the parent vertex's adjacent edges in the tangential plane of the sub-surface. In other words, the normals of the adjacent two edges of a vertex on the underlying sub-surface are averaged to get the extrusion direction.
+In the first step, we extrude the parent point to get the extruded point. We would interchangeably call the extruded points the kid points as they represent the successors of their parent points from the previous layer. The direction of this extrusion is set up to be the average of the normals of the parent vertex's adjacent edges in the tangential plane of the sub-surface. In other words, the normals of the adjacent two edges of a vertex on the underlying sub-surface are averaged to get the extrusion direction.
 
 Consider Figure \ref{fig-pointPlacement1}. The initial input triangulation is marked $T$ and the Bezier surface representation is marked $S$. Point $P$ is on the boundary curve of the surface. We need to find the extrusion direction of P to know where its kid will be located. In the underlying triangulation $T$, $PB$ and $PA$ are the edges adjacent to $P$ on the boundary of the surface $S$. We first find the mid-points of quartic-Bezier curves $PB$ and $PA$ which are constructed by CGM as a part of constructing the quartic-Bezier triangular surface patches from the underlying triangulation $T$. Next, we find the normal directions on the surface at these mid-points. The normal directions are carefully queried from the sub-surface which is being meshed currently. The normal directions are labeled as $N_b$ and $N_a$ in the figure. We take the cross product of the vector $PB$ with $N_b$ to get the direction $T_b$. The vector $T_b$ is normal to the edge $PB$ as well as tangential to the surface $S$. Similarly, we find the vector $T_a$, which is normal to the edge $PA$ and tangential to surface $S$. The direction of extrusion $\overrightarrow{PK}$ is chosen to be the average of the direction of $T_a$ and $T_b$.
 
@@ -202,26 +202,26 @@ After advancing one layer to the surface interior, we increase the extrusion len
 \begin{figure}[!hbt]
     \centering
     \includegraphics[width=.5\textwidth]{img/m1/deviate-surface.eps}
-    \caption{Triangle $T$ deviates from the underlying surface $S$. $P$ is the centroid of $T$ and $P_s$ is the projection of $P$ on $S$. The deviation is calculated as the interior angle between the normal to the triangle $PN$ and the normal to the surface at $P_s$, which is $P_sN_s$. The angle $\theta$ represents the deviation here. The deviation is exaggerated for illustration purposes.}
+    \caption[Deviation of a cell in the mesh from the underlying surface.]{Triangle $T$ deviates from the underlying surface $S$. $P$ is the centroid of $T$ and $P_s$ is the projection of $P$ on $S$. The deviation is calculated as the interior angle between the normal to the triangle $PN$ and the normal to the surface at $P_s$, which is $P_sN_s$. The angle $\theta$ represents the deviation here. The deviation is exaggerated for illustration purposes.}
     \label{deviation-surface}
 \end{figure}
 
 \subsection{Extrusion Length Scaling}
 \label{extrusionLengthScaling}
 
-The initial extrusion length $x_i$ for the mesh is an input parameter provided by the user. This length, along with the growth ratio $g$ defines the refinement in the direction normal to the boundary curves in the surface mesh. Keeping $x_i$ constant along the boundary curve is one way to proceed with the mesh generation procedure. However, at the concave corners of the mesh, using a uniform extrusion length would result in immediate front collapse as the neighbours of the corner would race towards each other while the corner vertex lags behind in the advancing layers. Hence, some sort of extrusion length scaling is required at the front which takes into account the angle included between the edges adjacent to the vertex on the front.
+The initial extrusion length $x_i$ for the mesh is an input parameter provided by the user. This length, along with the growth ratio $g$ defines the cell dimension in the direction normal to the boundary curves in the surface mesh. Keeping $x_i$ constant along the boundary curve is one way to proceed with the mesh generation procedure. However, at the concave corners of the mesh, using a uniform extrusion length would result in nearly immediate front collapse as the neighbours of the corner would race towards each other while the corner vertex lags behind in the advancing layers. Hence, some sort of extrusion length scaling is required at the front which takes into account the angle included between the edges adjacent to the vertex on the front.
 
 
-Let us consider a concave corner vertex $P$ in the mesh located on an advancing layer. The adjacent edges to $P$ on the layer are $PR$ and $PQ$. The included angle between these two edges is denoted as $2\theta$. Let's assume that the length of the edge $PQ$ is $l$ (see Figure \ref{fig:basic-diagram-extrusion-factor}) and the extrusion length for the layer at which vertex $P$ is located is $h$. We need to find a reasonable extrusion direction and extrusion length for the corner point P.
+Let us consider a concave corner vertex $P$ in the mesh located on an advancing layer (see Figure \ref{fig:basic-diagram-extrusion-factor}). The adjacent edges to $P$ on the layer are $PR$ and $PQ$. The included angle between these two edges is denoted as $2\theta$. Let's assume that the length of the edge $PQ$ is $l$ and the extrusion length for the layer at which vertex $P$ is located is $h$. We need to find a reasonable extrusion direction and extrusion length for the corner point P.
 
 \begin{figure}[hbt!]
     \centering
     \includegraphics[width=.6\linewidth]{img/m1/extrusionScaling/extrusionScaling.eps}
-    \caption{Extrusion }
+    \caption[Extrusion length scaling procedure.]{Extrusion length scaling. Vertex $X$ is the successor of vertex $P$. We race $X$ to the interior of the surface if the interior angle between the adjacent edges of vertex $P$ is less than a straight angle.}
     \label{fig:basic-diagram-extrusion-factor}
 \end{figure}
 
-For good quad cells in the surface mesh, i.e. quad cells with angles as close to right angles as possible, we need the point $P$ to `race' a bit initially towards the interior to catch up with its adjacent points. This would be helpful in avoiding mesh collisions. Hence, we formulate a method to find the scaling factor for the extrusion length.
+For good quad cells in the surface mesh, i.e. quad cells with angles as close to right angles as possible, we need the point $P$ to `race' a bit initially towards the interior to catch up with its adjacent points. This would be helpful in avoiding front collisions. Hence, we formulate a method to find the scaling factor for the extrusion length.
 
 The line $\mathit{PC}$ is constructed at equal angles from edge $\mathit{PR}$ and $\mathit{PQ}$. Let us place the point $\mathit{X}$ extruded from point $P$ on the line $\mathit{PC}$. In an orthogonal structured mesh scenario, if the angle between $\mathit{PR}$ and $\mathit{PQ}$ was 180 degrees, the extrusion direction should have been along the edge $\mathit{PA}$ and the extruded point would be at a distance $\mathit{h}$ from the point $\mathit{P}$, which coincides with point $\mathit{A}$ in the figure. The quad thus formed would have been $\mathit{PABQ}$. However, this is not the case. We have a skewed interior angle between $\mathit{PQ}$ and $\mathit{PR}$. If we place the extruded point at a distance $\mathit{h}$ from $\mathit{P}$ along $\mathit{PC}$, the mesh is going to fold onto itself in the next few layers. To avoid this, we take an alternative approach. We place the point $\mathit{X}$ further away than distance $\mathit{h}$. This distance is calculated using the following strategy.
 
@@ -241,9 +241,9 @@ Line $\mathit{PC}$ intersects $\mathit{AB}$ at point $\mathit{T}$. The area of t
     \label{eqn:area-constraint}
 \end{equation}
 
-Using this equation, we can find the length $\mathit{PX}$. Line segment $\mathit{PT}$ is of length $s_1$ and $\mathit{TX}$ is of length $s_2$. Hence, $\mathit{PX = s_1 + s_2}$. $s_1$ can be easily computed as $h/\sin \, \theta$. To find $s_2$, we use the area constraint from equation \ref{eqn:area-constraint}. Area of triangles $\mathit{\bigtriangleup ATP}$ and $\mathit{\bigtriangleup TXB}$ can be easily computed in terms of variables $h$, $l$ and $\theta$.
+Using this equation, we can find the length $\mathit{PX}$. Line segment $\mathit{PT}$ is of length $s_1$ and $\mathit{TX}$ is of length $s_2$. Hence, $\mathit{PX = s_1 + s_2}$. $s_1$ can be easily computed as $h/\sin \, \theta$. To find $s_2$, we use the area constraint from Equation \ref{eqn:area-constraint}. The areas of triangles $\mathit{\bigtriangleup ATP}$ and $\mathit{\bigtriangleup TXB}$ can be easily computed in terms of variables $h$, $l$ and $\theta$.
 \begin{equation}
-    Area(\mathit{\bigtriangleup ATP}) = \dfrac{1}{2} \, . \,  h \, .  \, \dfrac{h}{\tan \, \theta}
+    Area(\mathit{\bigtriangleup ATP}) = \dfrac{1}{2} \,  \,  h \,   \, \dfrac{h}{\tan \, \theta}
     \label{eqn-area1}
 \end{equation}
 
@@ -258,7 +258,7 @@ Solving for $s_2$ using equations \ref{eqn:area-constraint}, \ref{eqn-area1} and
      & \dfrac{1}{2} \dfrac{h^2}{\tan \, \theta}  & = & \dfrac{1}{2} s_2 \left(l - \dfrac{h}{\tan \, \theta} \right) \sin \, \theta  \\
     %\implies & \dfrac{h^2}{\tan \, \theta}& =  & s_2 \left( l - \dfrac{h}{\tan \, \theta} \right) sin \theta \\
     %\implies & s_2& = & \dfrac{h^2}{\sin \, \theta \left( l \: \tan \, \theta - h \right)} \\
-    \implies & s_2& = & \dfrac{h}{\sin \, \theta} . \: \dfrac{1}{ (l/h)\, \tan \, \theta - 1}
+    \implies & s_2& = & \dfrac{h}{\sin \, \theta}  \: \dfrac{1}{ (l/h)\, \tan \, \theta - 1}
 \end{array}
 \end{equation}
 
@@ -289,7 +289,7 @@ And the extrusion factor $f$ is simply $PX/h$
 
 Hence, the extrusion factor $f$ depends on the half included angle $\theta$ and the aspect ratios $\AR_1 \text{ and } \AR_2$ at the vertex. We use a couple of constraints while using this extrusion factor. First, we ensure that $\AR > cot \theta$, so that we never get negative values for $f$. Secondly, we limit the extrusion length at any vertex to be less than the minimum of the length of adjacent edges on the boundary. This is done because the extrusion factor can be  really large for small angles and small aspect ratios. Hence, to avoid generating skinny elements at concave corners of the mesh, we limit the extrusion length at any vertex such that the resultant aspect ratio at that vertex would always be more than 1. Figure \ref{fig-extrusionScaling} shows an example of scaling the extrusion length at the concave corner. Along with preventing layers to fold onto themselves, this technique also helps in improving the quality of quad cells generated in the mesh.
 
-Extrusion length scaling works similar to the principle of hyperbolic meshing, where corners are raced towards the interior of the domain to make the successive layers more rounded. Immediate front collapses are avoided for a great extent for majority of cases by using such scaling. However, if the corners are quite sharp ($<10^{\circ}$) or the refinement on the boundary curves is not sufficiently high, front collapses are inevitable. Hence, we implement a separate subroutine to handle such corner collisions in section *ref*.
+Extrusion length scaling works similar to the principle of hyperbolic meshing, where corners are raced towards the interior of the domain to make the successive layers more rounded. Immediate front collapses are avoided for a great extent for majority of cases by using such scaling. However, if the corners are quite sharp ($<10^{\circ}$) or the refinement on the boundary curves is not sufficiently high, front collapses are inevitable. Hence, we implement a separate subroutine to handle such corner collisions in Section \ref{collisionConcaveCorner}.
 
 %One important assumption in this derivation is that $A_1$ and $A_2$ should be less than $tan\, \theta$. If this is not the case, we might get negative values for $f$.
 
@@ -307,7 +307,7 @@ Extrusion length scaling works similar to the principle of hyperbolic meshing, w
 \caption{}
 \label{subfigure-extrusionScaling2}
 \end{subfigure}
-\caption{Extrusion length scaling is illustrated using a concave corner. In (a), the layers are about to fold onto one another because of constant extrusion length at each layer. (b) shows the vertex at the corner having a larger scaled extrusion length so as to maintain higher quad quality and prevent layer collision.}
+\caption[Illustration of how extrusion length scaling works in a mesh.]{Extrusion length scaling is illustrated using a concave corner. In (a), the layers are about to fold onto one another because of constant extrusion length at each layer. (b) shows the vertex at the corner having a larger scaled extrusion length so as to maintain higher quad quality and prevent layer collision.}
 \label{fig-extrusionScaling}
 \end{figure}
 
@@ -339,7 +339,7 @@ Extrusion length scaling works similar to the principle of hyperbolic meshing, w
   \caption{}
   \label{point-insert4}
 \end{subfigure}
-\caption{Point Insertion and local reconnection for quality shown in four steps. Red dashed circles highlight the region of the mesh that is being modified. (a) is the initial state of the mesh. A point is inserted in the mesh after extrusion from the parent point, projection onto the surface and finding the right triangle to insert. The triangle is subdivided into three new triangles as shown in (b). To improve the mesh quality after point insertion, swapping is done based on maximization of the minimum angle in a triangle. Two swaps occur as shown in figure (c) and (d) to improve mesh quality.}
+\caption[Point insertion and local reconnection in EDAMSurf.]{Point Insertion and local reconnection for quality shown in four steps. Red dashed circles highlight the region of the mesh that is being modified. (a) is the initial state of the mesh. A point is inserted in the mesh after extrusion from the parent point, projection onto the surface and finding the right triangle to insert. The triangle is subdivided into three new triangles as shown in (b). To improve the mesh quality after point insertion, swapping is done based on maximization of the minimum angle in a triangle. Two swaps occur as shown in figure (c) and (d) to improve mesh quality.}
 \label{point-insert}
 \end{figure}
 
@@ -392,10 +392,10 @@ In an advancing layer mesh generation algorithm, an accurate representation of t
   \caption{}
   \label{force-swap5}
 \end{subfigure}
-\caption{Front Recovery: Point $P_1$ and point $P_2$ here represent the two kid points generated from the boundary of the surface. We try to force a connection between the two points by iteratively swapping edges which topologically obstruct their connection. Red dashed lines represents the edge chosen to be swapped next. In (e), the green edge is the edge recovered and would serve as a part of the next front in the mesh. Note that this example is for front recovery illustration purposes and the initial boundary discretization is too coarse to get a good-quality advancing layer mesh.}
+\caption[Front recovery by iterative edge swapping]{Front Recovery: Point $P_1$ and point $P_2$ here represent the two kid points generated from the boundary of the surface. We try to force a connection between the two points by iteratively swapping edges which topologically obstruct their connection. Red dashed lines represents the edge chosen to be swapped next. In (e), the green edge is the edge recovered and would serve as a part of the next front in the mesh. Note that this example is for front recovery illustration purposes and the initial boundary discretization is too coarse to get a good-quality advancing layer mesh.}
 \label{force-swap}
 \end{figure}
 
 Front recovery is done by selecting a pair of points from the parent layer and then forcing an edge between the points extruded from these parent points; that is by forcing an edge between the kid vertices in the extruded layer. An edge is forced between the kid vertices by iteratively swapping any edge that lies topologically in between the two kid points. This kind of forced swapping in the mesh might seem to decrease mesh quality. However, with the right boundary discretization, it helps in giving us the high-aspect ratio elements in the mesh that we desire.
 
-Figure \ref{force-swap} shows how exactly we recover an edge in the front by iteratively swapping the edges which obstruct the edge creation between two kid vertices, $P_1$ and $P_2$ in the figure. The edges which are topologically obstructing kid vertices $P_1$ and $P_2$ are swapped iteratively. A test is setup for each swap to avoid the flipping of triangles on the surface. After all the obstructing edges are swapped, a front edge between the kid vertices $P_1$ and $P_2$ would be recovered as shown in green in Figure \ref{force-swap5}. After forcing an edge between all the adjacent kid vertices, validity checks are run to ensure that the extruded layer is well defined and there are no discrepancies in this layer as it will serve as the parent layer for the next one. This incorporates checking the connectivity of each vertex with its adjacent edges and the connectivity of each edge with its end points. 
+Figure \ref{force-swap} shows how exactly we recover an edge in the front by iteratively swapping the edges which obstruct the edge creation between two kid vertices, $P_1$ and $P_2$ in the figure. The edges which are topologically obstructing kid vertices $P_1$ and $P_2$ are swapped iteratively. A test is set up for each swap to avoid the flipping of triangles on the surface. After all the obstructing edges are swapped, a front edge between the kid vertices $P_1$ and $P_2$ would be recovered as shown in green in Figure \ref{force-swap5}. After forcing an edge between all the adjacent kid vertices, validity checks are run to ensure that the extruded layer is well defined and there are no discrepancies in this layer as it will serve as the parent layer for the next one. This incorporates checking the connectivity of each vertex with its adjacent edges and the connectivity of each edge with its end points. 
