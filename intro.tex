@@ -9,28 +9,28 @@
     Giants.} ---~Sir Isaac Newton (1655)
 \end{epigraph}
 
-Computational Fluid Dynamics (CFD) is a field of study where scientists and engineers architect new ways to numerically solve fluid flow equations. Before the advent of computers, numerical solutions of differential equations was done by hand. This lead to a great deal of work in the direction of creating faster algorithms to solve differential equations. An example is the development of the Fast Fourier Transform (FFT) by Cornelius Lancoz to increase the computation speed of Discrete Fourier Transforms (DFT). However, since the development and advancement of computers, engineers have had a significant amount of compute power to work with. This led to the development of highly accurate methods (as compared to before) to simulate flow over various objects. These simulations have since gotten bigger and better, typically including millions of Degrees Of Freedom (DOF), and now even starting to touch a billion in regular industrial use. Computers have become faster with time. This has made solving bigger problems easy. However, faster and more accurate algorithms have taken us closer to the goal of solving these problems and have been equally important in the process, if not less.
+Computational Fluid Dynamics (CFD) is a field of study where scientists and engineers architect new ways to numerically solve fluid flow equations. Before the advent of computers, numerical solutions of differential equations were done by hand. This lead to a great deal of work in the direction of creating faster algorithms to solve differential equations. An example is the development of the Fast Fourier Transform (FFT) by Cornelius Lancoz to increase the computation speed of Discrete Fourier Transforms (DFT). However, since the development and advancement of computers, engineers have had a significant amount of computing power to work with. This led to the development of highly accurate methods (as compared to before) to simulate flow over various objects. These simulations have since gotten bigger and better, typically including millions of Degrees Of Freedom (DOF), and now even starting to touch a billion in regular industrial use. Computers have become faster with time. This has made solving bigger problems easy. Complimenting computer hardware improvements, faster and more accurate algorithms have been equally important in the process of solving bigger fluid flow problems, if not less.
 
 \section{Mesh Generation - A Brief Overview}
 
-The equations which describe the conservation of mass, momentum and energy of a moving fluid, called the Navier-Stokes equations, are solved in the given domain to simulate fluid flow in that domain. In order to numerically solve these equations, we need a discretization of the domain. This discrete basis required to solve the Navier-Stokes equations is called a mesh. Simply put, a mesh is a collection of points, lines and cells that together construct the space around a body in a fluid flow. Save a few exotic methods, almost all of the techniques in CFD require a mesh to solve the flow on.
+The equations which describe the conservation of mass, momentum, and energy of a moving fluid, called the Navier-Stokes equations, are solved in the given domain to simulate fluid flow in that domain. To numerically solve these equations, we need a discretization of the domain. This discrete basis required to solve the Navier-Stokes equations is called a mesh. Simply put, a mesh is a collection of points, lines, and cells that together construct the space around a body in a fluid flow. Save a few exotic methods, almost all of the techniques in CFD require a mesh to solve the flow on.
 
 \begin{definition}
 	A \textbf{mesh} $M$ is a geometrical discretization of a domain $\Omega$ that consists of (a) a collection of mesh entities $M_i$ of controlled size and distribution and (b) topological relationships or adjacencies forming the graph of the mesh. The mesh $M$ covers $\Omega$ with neither overlaps nor holes.
 \end{definition}
 
-The process of discretization of the domain to form the mesh is called mesh generation. Traditionally, mesh generation was a very manual process, where engineers used to place the mesh points and cells by hand. This was even before the Electronic Numeric Integrator and Computer (ENIAC) was available. Such heuristic approach to mesh generation gave them a lot of freedom in discretizing the domain. Cells could be aligned to the boundaries of objects. The quality of the cells, which was taken as some measure of the interior angle of the cells, was almost always chosen to be good. The benefits of this method were quite evident. However, there were some major drawbacks. The process of mesh generation was incredibly slow. Engineers would spend hours, sometime days to create the mesh for a given geometry. Also, mesh adaptation with solution was almost non-existant because that would have made the process even slower.
+The process of discretization of the domain to form the mesh is called mesh generation. Traditionally, mesh generation was a very manual process, where engineers used to place the mesh points and cells by hand. This was even before the Electronic Numeric Integrator and Computer (ENIAC) was available. Such a heuristic approach to mesh generation gave engineers a lot of freedom in discretizing the domain. Cells could be aligned to the boundaries of objects. The quality of the cells, which was taken as some measure of the interior angle of the cells, was almost always chosen to be good. The benefits of this method were quite evident. However, there were some major drawbacks. The process of mesh generation was incredibly slow. Engineers would spend hours, sometimes days to create the mesh for a given geometry. Also, mesh adaptation with the solution was almost non-existent because that would have made the process even slower.
 
 \begin{definition}
-	A \textbf{vertex} is a zero dimensional entity in the mesh which stores the location of one of the points in a domain $\Omega$. It is the simplest mesh entity.
+	A \textbf{vertex} of a mesh is a zero-dimensional entity which stores the location of one of the points on the mesh. Usually, this point is also on the input domain $\Omega$. It is the simplest mesh entity.
 \end{definition}
 
 \begin{definition}
-	A \textbf{edge} in a mesh is a one dimensional entity that has a vertex on each of its ends.
+	A \textbf{edge} in a mesh is a one dimensional entity that has a vertex on each of its ends. An edge forms the basis of a cell in the mesh.
 \end{definition}
 
 \begin{definition}
-	A \textbf{cell} is the mesh entity which fills the domain $\Omega$. A cell can consist of three or more vertices.
+	A \textbf{cell} is the mesh entity which comprises of three or more edges. A triangle is an example of a cell. Several cells form the mesh which fill a given domain $\Omega$. A cell can consist of three or more vertices.
 \end{definition}
 
 \begin{figure}
@@ -47,7 +47,7 @@ The process of discretization of the domain to form the mesh is called mesh gene
     \caption{}
     \label{fig-unstructured}
   \end{subfigure}%
-  \caption[Structured and Unstructured meshes]{(a) A structured mesh. Cells in the mesh could be identified by given indices. (b) An unstructured mesh. Cells are arranged in a more random manner. One cannot identify a cell with a given index.}
+  \caption[Structured and Unstructured meshes]{(a) A structured mesh. Cells in the mesh could be identified by given indices. (b) An unstructured mesh. Cells are arranged in a random manner. One cannot identify a cell with a given index.}
   \label{fig-structured-unstructured}
 \end{figure}
 
